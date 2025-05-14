@@ -9,11 +9,21 @@ from layouts.dashboard_layout import create_dashboard_layout
 from data_processing import load_data, get_dashboard_metrics
 from layouts.footer import create_footer
 
+
 # Define theme colors
 EMERALD = "#2ecc71"
 DARK_GREEN = "#27ae60" 
 LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
+
+
+def get_enhanced_public_landing():
+    """
+    Dynamically import the enhanced public landing to avoid circular imports.
+    """
+    from layouts.enhanced_public_landing import create_enhanced_public_landing
+    return create_enhanced_public_landing()
+
 
 def create_main_layout():
     """
@@ -228,9 +238,9 @@ def create_public_landing_page():
                         
             # Add interval for clock updates
             dcc.Interval(
-                id='clock-interval',
-                interval=1000,  # 60 second
-                n_intervals=0
+            id='clock-interval',
+            interval=1000,  # 1 second for real-time clock
+            n_intervals=0
             )
         ], className="py-2 px-2 px-sm-3", fluid=True),  # Use fluid container for full TV width
         create_footer()
@@ -238,13 +248,14 @@ def create_public_landing_page():
 
 # URL routing callback function (implemented in callbacks/auth_callbacks.py)
 def display_page(pathname, is_authenticated):
+
     """
     Display the appropriate page based on URL and authentication state.
     """
-    # Make sure this condition is working correctly
     if pathname == '/':
         if not is_authenticated:
-            return create_public_landing_page()  # This should show the public dashboard
+            # Use the enhanced public landing page
+            return get_enhanced_public_landing()
         else:
             return create_dashboard_layout()
     elif pathname == '/login':

@@ -10,6 +10,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, curren
 import os
 import time
 import threading
+from callbacks.enhanced_public_callbacks import register_enhanced_public_callbacks
+
 
 # Create a Flask server
 server = flask.Flask(__name__)
@@ -138,6 +140,7 @@ app.layout = create_main_layout()
 register_auth_callbacks(app)
 register_dashboard_callbacks(app)
 register_public_landing_callbacks(app)  # Add the public landing page callbacks
+register_enhanced_public_callbacks(app)
 
 # Add endpoint to get last modified time
 @server.route('/api/data-modified-time')
