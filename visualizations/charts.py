@@ -11,6 +11,7 @@ from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
 from data_processing import get_daily_progress, get_vendor_progress, get_cluster_progress
+import plotly.graph_objects as go
 
 # Define theme colors
 EMERALD = "#2ecc71"
@@ -24,17 +25,34 @@ Update to visualizations/charts.py to optimize the progress gauge for fixed-size
 
 def create_progress_gauge(percent_complete):
     """
-    Create a gauge chart for overall progress, optimized for fixed-size cards.
+    Create a gauge chart for overall progress with normal size
+    and properly visible markers and percentage.
+    
+    Args:
+        percent_complete (float): Percentage completion value
+        
+    Returns:
+        plotly.graph_objects.Figure: The gauge chart figure
     """
     fig = go.Figure()
     
     fig.add_trace(go.Indicator(
         mode="gauge+number",
         value=percent_complete,
-        domain={'x': [0, 1], 'y': [0, 1]},
+        domain={'x': [0, 1], 'y': [0, 1]},  # Full domain for normal size
         gauge={
-            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "gray", 'visible': True},
-            'bar': {'color': EMERALD},
+            'axis': {
+                'range': [0, 100],  # Explicit range from 0 to 100
+                'tickwidth': 1.5,  # Wider ticks for visibility
+                'tickcolor': "#555555",  # Darker tick color
+                'visible': True,
+                'tickfont': {'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'size': 12},  # Larger font
+                'tickmode': 'array',  # Set explicit tick values
+                'tickvals': [0, 20, 40, 60, 80, 100],  # Force specific tick values
+                'ticktext': ['0', '20', '40', '60', '80', '100'],  # Force specific tick labels
+                'showticklabels': True,  # Ensure tick labels are shown
+            },
+            'bar': {'color': EMERALD, 'thickness': 0.7},  # Normal thickness
             'bgcolor': "white",
             'borderwidth': 0,
             'steps': [
@@ -48,17 +66,64 @@ def create_progress_gauge(percent_complete):
         },
         number={
             'suffix': "%", 
-            'font': {'size': 24}
+            'font': {'size': 28, 'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'color': DARK_GREEN},  # Larger size
+            'valueformat': '.1f',  # One decimal place
         }
-        # No title property - fixed!
     ))
     
+    # Update layout to ensure proper display
     fig.update_layout(
+        margin=dict(l=20, r=20, t=40, b=20),  # Adjusted margins to ensure markers are visible
+        paper_bgcolor="white",
+        autosize=True,  # Enable autosize for responsive behavior
+        height=140,  # Normal height - increased from previous
+        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",  # Palatino font family
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False)
+    )
+    
+    return fig
+    # Update layout to ensure proper display
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=30, b=30),  # Increased margins to ensure markers are visible
+        paper_bgcolor="white",
+        autosize=True,  # Enable autosize for responsive behavior
+        height=95,  # Reduced height (15% less than original 110px)
+        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",  # Palatino font family
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        annotations=[
+            dict(
+                x=0.5,
+                y=0,
+                xref="paper",
+                yref="paper",
+                showarrow=False,
+                font=dict(
+                    family="Palatino Linotype, Book Antiqua, Palatino, serif",
+                    size=10,
+                    color="#666666"
+                )
+            )
+        ]
+    )
+    
+    return fig
+    
+    # Update layout for proper centering and responsive behavior
+    fig.update_layout(
+        # Remove all margins to ensure centering
         margin=dict(l=0, r=0, t=0, b=0),
         paper_bgcolor="white",
-        height=100,
-        width=160,
-        autosize=False
+        # Use autosize for better container fitting
+        autosize=True,
+        # Set a reasonable height that works well in cards
+        height=20,
+        # Font settings for all text elements
+        font_family="Georgia",
+        # Make sure the gauge fits well in its container
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False)
     )
     
     return fig

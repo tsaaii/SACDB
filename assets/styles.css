@@ -1,13 +1,27 @@
-/* 
+/* Make the hover area work more reliably but still completely invisible */
+.navbar-trigger:hover + .hidden-navbar,
+.hidden-navbar:hover {
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0) !important;
+}/* 
 assets/styles.css - Custom CSS styles for the dashboard
 
-This file contains all custom styles for the dashboard application.
+This file contains all custom styles for the dashboard application, 
+including UI/UX improvements.
 */
 
 /* Global styles */
 body {
     background-color: #f1f9f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+}
+
+/* Palatino Linotype font implementation */
+h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, textarea, select,
+.btn, .nav-link, .dropdown-menu, .form-control, .table th, .table td, 
+.card-title, .card-text, .alert, .tooltip, .popover, .badge, .list-group-item {
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
 }
 
 /* Login page styles */
@@ -24,6 +38,7 @@ body {
     color: #27ae60;
     text-align: center;
     margin-bottom: 30px;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .login-button {
@@ -33,6 +48,7 @@ body {
     padding: 10px;
     font-weight: bold;
     transition: background-color 0.3s;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .login-button:hover {
@@ -60,6 +76,83 @@ body {
     color: #2ecc71;
 }
 
+/* Hidden top navbar that appears on hover - completely invisible and transparent by default */
+.hidden-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+    z-index: 1030;
+    box-shadow: none;
+    border: none;
+    background-color: rgba(0, 0, 0, 0) !important; /* Completely transparent */
+}
+
+/* When hovered, show the navbar but keep it transparent */
+.hidden-navbar:hover {
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0) !important; /* Keep transparent on hover */
+}
+
+/* Container within the navbar */
+.hidden-navbar .container {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hidden-navbar:hover .container {
+    opacity: 1;
+}
+
+/* Target area at the top of the page to trigger hover - completely invisible */
+.navbar-trigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 15px;
+    z-index: 1029;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+/* Custom green login button styling */
+#login-nav-button {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 6px 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+#login-nav-button:hover {
+    background-color: #2ecc71 !important;
+    border-color: #2ecc71 !important;
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3) !important;
+}
+
+/* Ensure no margin or padding at the top of the page */
+body {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Move content right to the top of page with no gap */
+.content-with-hidden-navbar {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: 0 !important;
+}
+
 /* Dashboard styles */
 .navbar {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -84,6 +177,7 @@ body {
     border-bottom: 1px solid #f0f0f0;
     font-weight: 600;
     padding: 15px 20px;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .card-body {
@@ -118,10 +212,12 @@ body {
     color: #444;
     border-top: none;
     background-color: #f8f9fa;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .table td {
     vertical-align: middle;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 /* Filter section */
@@ -135,8 +231,9 @@ body {
 
 /* Progress bars */
 .progress {
-    height: 10px;
-    border-radius: 5px;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
     margin-bottom: 5px;
 }
 
@@ -189,16 +286,21 @@ body {
     font-weight: 600 !important;
     color: #444 !important;
     border-bottom: 1px solid #e9ecef !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
 }
 
 .dash-cell {
     padding: 10px 15px !important;
     border-bottom: 1px solid #f0f0f0 !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
 }
 
 /* Tooltips */
 .tooltip-inner {
     background-color: #27ae60;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    font-size: 0.9rem;
+    padding: 8px 12px;
 }
 
 .bs-tooltip-auto[x-placement^=top] .arrow::before, 
@@ -210,6 +312,7 @@ body {
 .Select-control {
     border-radius: 4px;
     border: 1px solid #ced4da;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .Select-control:hover {
@@ -223,31 +326,35 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #2ecc71;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #27ae60;
 }
+
+/* Date Range Picker styling */
 .date-range-wrapper {
     display: flex;
     flex-direction: column;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .date-range-wrapper label {
     margin-bottom: 8px;
     font-weight: 500;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 /* Fix container height and styles */
@@ -265,6 +372,7 @@ body {
     background-color: transparent;
     display: flex;
     align-items: center;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 .date-range-inputs .DateInput {
@@ -280,6 +388,7 @@ body {
     border-radius: 0.25rem;
     background-color: white;
     color: #495057;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 /* Style the separator between dates */
@@ -304,6 +413,7 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
 /* Ensure calendar appears on top of other elements */
@@ -311,6 +421,64 @@ body {
     z-index: 1000 !important;
 }
 
+/* Fix gauge centering and sizing */
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 140px; /* Increased height for normal size */
+    position: relative; /* Enable proper positioning */
+}
+
+.centered-gauge {
+    margin: 0 auto !important;
+    display: block !important;
+    width: 100% !important; /* Ensure full width */
+    transform-origin: center center;
+    transform: scale(1.0); /* Normal size - no reduction */
+}
+
+/* Fix for percentage overlap */
+.js-plotly-plot .indicator-value {
+    transform: translateY(-5px); /* Move number text up slightly */
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
+}
+
+.js-plotly-plot .indicator-gauge {
+    margin-top: 15px !important; /* Add space above gauge */
+}
+
+/* Ensure gauge ticks are visible */
+.js-plotly-plot .gauge-arc path {
+    stroke-width: 1.5px !important; /* Thicker ticks */
+}
+
+.js-plotly-plot .gauge-circle path {
+    stroke-width: 1.5px !important; /* Thicker circles */
+}
+
+/* Increase legend and label sizes */
+.legend-text {
+    font-size: 1rem !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
+}
+
+.axis-label {
+    font-size: 11px !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
+}
+
+.tick text {
+    font-size: 10px !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
+}
+
+/* Ensuring chart labels are visible */
+.g-gtitle, .g-xtitle, .g-ytitle {
+    font-size: 12px !important;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
+}
 
 /* Mobile Responsive Enhancements */
 @media (max-width: 576px) {
@@ -383,6 +551,7 @@ body {
     /* iOS specific styling */
     input, select, textarea {
         font-size: 16px !important; /* Prevents auto zoom on focus */
+        font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
     }
     
     button {
@@ -409,6 +578,367 @@ body {
     }
 }
 
+/* TV Display Mode */
+@media (min-width: 1600px) {
+    body {
+        font-size: 18px;
+    }
+    
+    h1 {
+        font-size: 3.5rem;
+    }
+    
+    h2 {
+        font-size: 2.8rem;
+    }
+    
+    h3 {
+        font-size: 2.2rem;
+    }
+    
+    h4 {
+        font-size: 1.8rem;
+    }
+    
+    h5 {
+        font-size: 1.5rem;
+    }
+    
+    p {
+        font-size: 1.2rem;
+    }
+    
+    .card-header {
+        padding: 15px 20px;
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 1.2rem;
+    }
+    
+    /* Increase chart heights for TV */
+    .tv-chart {
+        height: 400px !important;
+    }
+    
+    /* Larger indicators and data points */
+    .tv-gauge {
+        height: 300px !important;
+    }
+    
+    /* Increase padding for better readability */
+    .container {
+        padding: 20px 40px;
+    }
+    
+    /* Larger footer text */
+    footer p {
+        font-size: 1.2rem;
+    }
+    
+    /* Higher contrast for better visibility */
+    .text-muted {
+        color: #555 !important;
+    }
+}
+
+/* Extra adjustments for 4K TVs */
+@media (min-width: 3000px) {
+    body {
+        font-size: 24px;
+    }
+    
+    h1 {
+        font-size: 4.5rem;
+    }
+    
+    h2 {
+        font-size: 3.5rem;
+    }
+    
+    .card-header {
+        padding: 20px 30px;
+        font-size: 2rem;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        font-size: 1.5rem;
+    }
+    
+    /* Even larger charts for 4K */
+    .tv-chart {
+        height: 600px !important;
+    }
+    
+    .tv-gauge {
+        height: 400px !important;
+    }
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+    }
+    
+    h5 {
+        font-size: 1rem;
+    }
+    
+    .login-container {
+        margin: 40px auto;
+        padding: 20px;
+        max-width: 90%;
+    }
+    
+    .card-header {
+        padding: 10px 15px;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .metric-card {
+        padding: 15px 10px;
+    }
+    
+    /* Improve touch targets for mobile */
+    button, .dropdown, .nav-link {
+        min-height: 44px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    /* Adjust filter elements */
+    .filter-section {
+        padding: 10px;
+    }
+    
+    /* Stack date picker better on mobile */
+    .date-range-inputs {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .date-range-inputs .DateInput {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Make sure tables don't overflow */
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    /* Fix vendor and cluster display in public mode */
+    #current-vendor-display,
+    #current-cluster-display {
+        font-size: 0.9rem;
+    }
+}
+
+/* Specific iPhone/iOS enhancements */
+@supports (-webkit-touch-callout: none) {
+    /* iOS specific styling */
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents auto zoom on focus */
+    }
+    
+    button {
+        -webkit-appearance: none; /* Remove default iOS button styling */
+        border-radius: 8px;
+    }
+}
+
+/* PWA specific styling */
+@media (display-mode: standalone) {
+    /* Add any specific styling when app is in PWA mode */
+    body {
+        -webkit-user-select: none; /* Prevent text selection */
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+    }
+    
+    .navbar {
+        padding-top: env(safe-area-inset-top);
+        height: calc(56px + env(safe-area-inset-top));
+    }
+    
+    .footer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Ensure consistent spacing between form elements */
+.form-element {
+    margin-bottom: 1rem;
+}
+
+/* Keep labels consistent */
+.form-element label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-family: 'Georgia', serif;
+}
+
+/* Ensure calendar appears on top of other elements */
+.DateRangePicker_picker {
+    z-index: 1000 !important;
+}
+
+/* Fix gauge centering */
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.centered-gauge {
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Increase legend and label sizes */
+.legend-text {
+    font-size: 1rem !important;
+    font-family: 'Georgia', serif !important;
+}
+
+.axis-label {
+    font-size: 11px !important;
+    font-family: 'Georgia', serif !important;
+}
+
+.tick text {
+    font-size: 10px !important;
+    font-family: 'Georgia', serif !important;
+}
+
+/* Ensuring chart labels are visible */
+.g-gtitle, .g-xtitle, .g-ytitle {
+    font-size: 12px !important;
+    font-family: 'Georgia', serif !important;
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .login-container {
+        margin: 40px auto;
+        padding: 20px;
+        max-width: 90%;
+    }
+    
+    .card-header {
+        padding: 10px 15px;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .metric-card {
+        padding: 15px 10px;
+    }
+    
+    .map-container {
+        height: 250px;
+    }
+    
+    /* Improve touch targets for mobile */
+    button, .dropdown, .nav-link {
+        min-height: 44px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    /* Adjust filter elements */
+    .filter-section {
+        padding: 10px;
+    }
+    
+    /* Stack date picker better on mobile */
+    .date-range-inputs {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .date-range-inputs .DateInput {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Make sure tables don't overflow */
+    .table-responsive {
+        overflow-x: auto;
+    }
+}
+
+/* Specific iPhone/iOS enhancements */
+@supports (-webkit-touch-callout: none) {
+    /* iOS specific styling */
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents auto zoom on focus */
+        font-family: 'Georgia', serif !important;
+    }
+    
+    button {
+        -webkit-appearance: none; /* Remove default iOS button styling */
+        border-radius: 8px;
+    }
+}
+
+/* PWA specific styling */
+@media (display-mode: standalone) {
+    /* Add any specific styling when app is in PWA mode */
+    body {
+        -webkit-user-select: none; /* Prevent text selection */
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+    }
+    
+    .navbar {
+        padding-top: env(safe-area-inset-top);
+        height: calc(56px + env(safe-area-inset-top));
+    }
+    
+    .footer {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
 
 /* TV Display Mode */
 @media (min-width: 1600px) {

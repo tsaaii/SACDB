@@ -1,17 +1,12 @@
 """
-layouts/enhanced_public_landing.py - Enhanced Public Landing Page
+layouts/enhanced_public_landing.py - Enhanced Public Landing Page with UI Improvements
 
-This file defines the enhanced public landing page layout optimized for
-auto-rotation between overview and vendor-specific views.
-
-Enhancements:
-1. Three metrics cards in one row to reduce white space
-2. Optimized histogram width
-3. Fixed cluster performance labels
-4. Consistent card heights
-5. Single site card when fewer than 3 sites
-6. Layout fits one screen without scrolling
-7. Compatibility fixes for different Plotly versions
+This file defines the enhanced public landing page layout with requested UI improvements:
+1. Fixed 48px navbar with proper spacing
+2. Palatino Linotype font implementation
+3. Properly sized and formatted progress gauge
+4. Removed bottom login prompt bar
+5. Overall UX improvements
 """
 
 from dash import html, dcc
@@ -38,52 +33,66 @@ BG_COLOR = "#f1f9f5"
 
 def create_public_navbar():
     """
-    Create a navbar for the public landing page with optimized height.
-    Enhanced to be even smaller/compact based on login button size.
+    Create a navbar that's completely hidden by default and only appears on hover,
+    showing the login button only when hovered.
     
     Returns:
-        dash component: The navbar component
+        dash component: The completely invisible navbar component
     """
-    return dbc.Navbar(
-        dbc.Container([
-            html.A(
-                dbc.Row([
-                    dbc.Col(html.I(className="fas fa-leaf", 
-                                   style={"fontSize": "18px", "color": "white"}), # Even smaller icon
-                            width="auto"),
-                    dbc.Col([
-                        dbc.NavbarBrand("Swaccha Andhra", 
-                                       style={"color": "white", "fontWeight": "bold", "fontSize": "15px"}), # Smaller font
-                        html.Span("Corporation", 
-                                 style={"color": "rgba(255,255,255,0.8)", "fontSize": "10px", "display": "block", "marginTop": "-5px"}) # Smaller font
-                    ], width="auto")
-                ], align="center", className="g-0"),
-                href="/",
-                style={"textDecoration": "none"}
-            ),
-            dbc.Nav([
-                dbc.Button([
-                    html.I(className="fas fa-sign-in-alt me-2"),
-                    "Login"
-                ], 
-                id="login-nav-button", 
-                color="light", 
-                size="sm", # Smaller button
-                className="ms-2 fw-bold",
-                href="/login")
-            ], className="ms-auto", navbar=True),
-        ]),
-        color=DARK_GREEN,
-        dark=True,
-        className="mb-2 py-0 shadow", # Further reduced padding
-        style={"minHeight": "36px"} # Even smaller fixed height
-    )
+    return html.Div([
+        # Target area to trigger the hover - completely invisible
+        html.Div(className="navbar-trigger", style={"opacity": 0}),
+        
+        # Hidden navbar that appears on hover - completely invisible by default
+        dbc.Navbar(
+            dbc.Container([
+                # Logo and title - aligned to left
+                html.A(
+                    dbc.Row([
+                        dbc.Col(html.I(className="fas fa-leaf", 
+                                       style={"fontSize": "18px", "color": "white"}),
+                                width="auto", className="me-1"), # Add margin between icon and text
+                        dbc.Col([
+                            dbc.NavbarBrand("Swaccha Andhra", 
+                                           style={"color": "white", "fontWeight": "600", "fontSize": "16px", 
+                                                  "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+                                                  "letterSpacing": "0.5px"}),
+                            html.Span("Corporation", 
+                                     style={"color": "rgba(255,255,255,0.8)", "fontSize": "10px", 
+                                            "display": "block", "marginTop": "-5px", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                        ], width="auto")
+                    ], align="center", className="g-0"),
+                    href="/",
+                    style={"textDecoration": "none"}
+                ),
+                
+                # Login button - aligned to right
+                dbc.Nav([
+                    dbc.Button([
+                        html.I(className="fas fa-sign-in-alt me-1"),
+                        "Login"
+                    ], 
+                    id="login-nav-button", 
+                    color="light", 
+                    size="sm",
+                    href="/login")
+                ], className="ms-auto", navbar=True),
+            ]),
+            color="transparent", # Start transparent
+            dark=True,
+            className="hidden-navbar",
+            style={"border": "none", "borderWidth": "0", "outline": "none"} # Ensure no borders
+        )
+    ], style={"height": 0, "overflow": "hidden", "border": "none", "outline": "none"}) # Make container invisible
 
 def create_enhanced_public_landing():
     """
-    Enhanced public landing page with:
-    - Combined title and subtitle in green
-    - Auto-refresh interval changed to 15 seconds
+    Enhanced public landing page with improved UI:
+    - Hidden navbar that appears on hover
+    - Palatino Linotype font implementation
+    - Properly sized and formatted progress gauge
+    - Better spacing and alignment
     
     Returns:
         dash component: The public landing page
@@ -92,66 +101,51 @@ def create_enhanced_public_landing():
         "backgroundColor": BG_COLOR, 
         "minHeight": "100vh",
         "color": TEXT_DARK,
-        "fontFamily": "'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"
     }, children=[
-        # Navbar
+        # Hidden navbar that appears on hover
         create_public_navbar(),
         
-        # Main content area with optimized height
+        # Main content area right at the top with no spacing
         dbc.Container([
-            # Status bar with clock and rotation indicator - more compact
+            # Status bar with clock and rotation indicator
             dbc.Row([
                 dbc.Col([
                     html.Div([
                         html.I(className="fas fa-clock me-2", style={"color": DARK_GREEN}),
-                        html.Span(id="navbar-clock", style={"fontWeight": 500})
+                        html.Span(id="navbar-clock", style={"fontWeight": 500, 
+                                                           "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                     ], className="d-flex align-items-center")
-                ], sm=6, className="mb-1 mt-1"), # Reduced margin
+                ], sm=6, className="mb-1 mt-1"),
                 dbc.Col([
                     html.Div([
-                        html.Span("Auto-refreshing data ", className="me-2"),
+                        html.Span("Auto-refreshing data ", className="me-2", 
+                                 style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif", 
+                                        "fontSize": "0.9rem"}),
                         html.I(id="refresh-indicator", className="fas fa-sync-alt fa-spin", 
                               style={"color": DARK_GREEN})
                     ], className="d-flex align-items-center justify-content-end")
-                ], sm=6, className="mb-1 mt-1 text-end") # Reduced margin
-            ], className="bg-white rounded shadow-sm py-1 px-3 mb-2"), # Reduced padding
+                ], sm=6, className="mb-1 mt-1 text-end")
+            ], className="bg-white rounded shadow-sm py-1 px-3 mb-3"), # Increased bottom margin
             
-            # Combined Title section - all in green with one styling
+            # Title section
             dbc.Row([
                 dbc.Col([
                     html.H2([
                         "Swaccha Andhra Waste Remediation ",
                         html.Small("Real-time monitoring dashboard", 
                                   className="d-block", 
-                                  style={"fontSize": "0.9rem", "fontWeight": "400"})
-                    ], className="text-center mb-2", # Reduced margin
-                       style={"color": DARK_GREEN, "fontWeight": "600", "fontSize": "1.6rem"}) # All in green
+                                  style={"fontSize": "1rem", "fontWeight": "400", 
+                                         "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                    ], className="text-center mb-3", # Maintain bottom margin
+                       style={"color": DARK_GREEN, "fontWeight": "600", "fontSize": "1.8rem", 
+                              "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
+                              "letterSpacing": "0.4px"})
                 ], width=12)
             ]),
             
-            # Dynamic content area with optimized height
-            html.Div(id="public-landing-content", className="mb-2"), # Reduced margin
-            
-            # Login prompt - more compact
-            dbc.Card([
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Div([
-                                html.I(className="fas fa-info-circle me-2", style={"color": ACCENT_BLUE}),
-                                html.Span("Dashboard auto-rotates to show all vendor data", 
-                                         style={"color": TEXT_DARK, "fontWeight": 500, "fontSize": "0.9rem"})
-                            ], className="d-flex align-items-center")
-                        ], sm=8),
-                        dbc.Col([
-                            dbc.Button([
-                                html.I(className="fas fa-user-lock me-2"),
-                                "Login for Controls"
-                            ], color="primary", href="/login", className="w-100", size="sm") # Smaller button
-                        ], sm=4, className="d-flex align-items-center justify-content-end")
-                    ])
-                ], className="py-2") # Reduced padding
-            ], className="shadow-sm mb-2 border-0"), # Reduced margin
+            # Dynamic content area
+            html.Div(id="public-landing-content", className="mb-3"),
             
             # Store component to maintain view state
             dcc.Store(id='public-view-state', data={
@@ -160,30 +154,38 @@ def create_enhanced_public_landing():
                 'rotation_count': 0
             }),
             
-            # Auto rotation interval - Changed from 60s to 15s
+            # Auto rotation interval - 15 seconds
             dcc.Interval(
                 id='auto-rotation-interval',
-                interval=15 * 1000,  # 15 seconds in milliseconds (reduced from 60s)
+                interval=15 * 1000,  # 15 seconds in milliseconds
                 n_intervals=0,
                 disabled=True  # Initially disabled, enabled only on landing page
             ),
-        ], fluid=True, className="py-2 px-3"), # Reduced padding
+            
+            # Clock interval - 1 second
+            dcc.Interval(
+                id='clock-interval',
+                interval=1000,  # 1 second in milliseconds
+                n_intervals=0
+            )
+        ], fluid=True, className="py-2 px-3 content-with-hidden-navbar"),
         
-        # Simplified footer for better fit
+        # Simplified footer
         html.Footer(
             dbc.Container([
-                html.Hr(style={"margin": "10px 0"}), # Reduced margin
+                html.Hr(style={"margin": "10px 0"}),
                 html.Div([
                     html.P([
                         "Made in Andhra Pradesh, with ",
                         html.I(className="fas fa-heart", style={"color": "#e74c3c"}),
                         " • © 2025 Advitia Labs"
-                    ], className="text-center text-muted small mb-0") # Smaller font
+                    ], className="text-center text-muted small mb-0", 
+                       style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                 ])
             ]),
             style={
-                "padding": "5px 0 10px 0", # Reduced padding
-                "marginTop": "5px", # Reduced margin
+                "padding": "5px 0 10px 0",
+                "marginTop": "5px",
             }
         )
     ])
@@ -191,14 +193,11 @@ def create_enhanced_public_landing():
 
 def create_overview_content(df, metrics):
     """
-    Create an optimized grid showing waste remediation overview with enhancements:
-    1. Optimized histogram width
-    2. Fixed cluster label formatting
-    3. Consistent card heights
-    4. Layout fits one screen without scrolling
-    5. Added axis labels to charts
-    6. Improved spacing between cards
-    7. Clearer legends
+    Create an optimized grid showing waste remediation overview with UI improvements:
+    - Palatino Linotype font for better readability
+    - Properly displayed progress gauge with all markers
+    - Larger legends and labels
+    - Better spacing between cards
     
     Args:
         df (pandas.DataFrame): The dashboard data
@@ -218,60 +217,75 @@ def create_overview_content(df, metrics):
     vendor_stats = metrics['vendor_stats']
     cluster_stats = metrics['cluster_stats']
     
-    # Set fixed height for all cards - slightly reduced for better spacing
-    main_card_height = "210px"
+    # Set fixed height for all cards - increased to accommodate normal gauge
+    main_card_height = "240px"
     vendor_card_height = "170px"
     
     # ===== CARD 1: Overall Progress Gauge =====
-    # Create chart with appropriate size
+    # Create chart with appropriate size and all markers
     progress_gauge = create_progress_gauge(metrics['percent_complete'])
-    progress_gauge.update_layout(height=110, margin=dict(l=5, r=5, t=5, b=5))
     
     card1 = dbc.Card([
         dbc.CardHeader([
             html.I(className="fas fa-chart-pie me-2", style={"color": DARK_GREEN}),
             "Overall Progress"
-        ], className="d-flex align-items-center fw-bold bg-white py-1"), # Minimal padding
+        ], className="d-flex align-items-center fw-bold bg-white py-1", 
+           style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
         dbc.CardBody([
             # Center the gauge
             html.Div([
                 # Date info
                 html.Div([
-                    html.Span("Data as of ", className="me-1"),
+                    html.Span("Data as of ", className="me-1", 
+                             style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                     html.Span(latest_date, 
-                             style={"fontWeight": "500", "color": ACCENT_ORANGE, "fontSize": "0.8rem"})
-                ], className="text-center mb-1"),
+                             style={"fontWeight": "500", "color": ACCENT_ORANGE, 
+                                    "fontSize": "0.9rem", 
+                                    "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                ], className="text-center mb-2"),
                 
-                # Progress gauge - smaller size and centered
-                dcc.Graph(
-                    figure=progress_gauge,
-                    config={'displayModeBar': False},
-                    style={'height': '110px', 'width': '100%'} # Full width ensures centering
-                ),
+                # Progress gauge - explicitly centered and normal size
+                html.Div([
+                    dcc.Graph(
+                        figure=progress_gauge,
+                        config={'displayModeBar': False},
+                        className="centered-gauge", # CSS class for centering
+                        style={'height': '140px', 'margin': '0 auto', 'display': 'block'}
+                    )
+                ], className="d-flex justify-content-center align-items-center gauge-container"),
                 
-                # Legend below gauge - ADDED
+                # Legend below gauge
                 html.Div([
                     html.Span(f"{metrics['percent_complete']:.1f}% of waste remediated", 
-                             style={"fontWeight": "500", "color": DARK_GREEN, "fontSize": "0.9rem"})
-                ], className="text-center mb-2"),
+                             style={"fontWeight": "500", "color": DARK_GREEN, 
+                                    "fontSize": "1rem", 
+                                    "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                ], className="text-center my-2"),
                 
                 # Statistics below gauge
                 html.Div([
                     html.Div([
                         html.Div([
-                            html.Span("Remediated: ", className="me-1 text-muted small"),
+                            html.Span("Remediated: ", className="me-1 text-muted",
+                                     style={"fontSize": "0.9rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                             html.Span(f"{metrics['total_remediated']:,.0f} MT", 
-                                     style={"fontWeight": "500", "color": DARK_GREEN}, className="small")
+                                     style={"fontWeight": "500", "color": DARK_GREEN, 
+                                            "fontSize": "0.9rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                         ], className="me-2"),
                         html.Div([
-                            html.Span("Target: ", className="me-1 text-muted small"),
+                            html.Span("Target: ", className="me-1 text-muted",
+                                     style={"fontSize": "0.9rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                             html.Span(f"{metrics['total_to_remediate']:,.0f} MT", 
-                                     style={"fontWeight": "500"}, className="small")
+                                     style={"fontWeight": "500", "fontSize": "0.9rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                         ])
                     ], className="d-flex justify-content-center")
-                ], className="mt-1")
+                ], className="mt-2")
             ], className="d-flex flex-column justify-content-center align-items-center h-100")
-        ], className="p-2", style={"height": "calc(100% - 38px)"}) # Fixed height minus header
+        ], className="p-2", style={"height": "calc(100% - 38px)"})
     ], className="shadow-sm border-0 h-100", style={"height": main_card_height})
     
     # ===== CARD 2: Lagging Clusters Histogram =====
@@ -297,41 +311,43 @@ def create_overview_content(df, metrics):
         hovertemplate='%{y}: %{text}<extra></extra>'
     ))
     
-    # Optimize layout for compact display with axis labels
+    # Optimize layout for compact display with Palatino Linotype font labels - increased by 20%
     lagging_fig.update_layout(
-        margin=dict(l=10, r=10, t=5, b=30), # Adjusted margins for labels
+        margin=dict(l=15, r=15, t=10, b=35), # Increased margins for larger labels
         paper_bgcolor='white',
         plot_bgcolor='white',
         showlegend=False,
         xaxis=dict(
             title="Completion Percentage",  # Added axis label
-            title_font=dict(size=9),  # Small title font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
             ticksuffix="%",
             range=[0, 100],
-            tickfont=dict(size=8),  # Smaller font
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             showgrid=True,
             gridcolor='rgba(0,0,0,0.05)'
         ),
         yaxis=dict(
             title="Cluster",  # Added axis label
-            title_font=dict(size=9),  # Small title font
-            tickfont=dict(size=8),  # Smaller font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             automargin=True  # Auto adjust margins
         ),
-        height=150
+        height=160,  # Increased height slightly to accommodate larger labels
+        font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif")  # Set Palatino Linotype font for all text elements
     )
     
     card2 = dbc.Card([
         dbc.CardHeader([
             html.I(className="fas fa-exclamation-triangle me-2", style={"color": ACCENT_ORANGE}),
             "Lagging Clusters"
-        ], className="d-flex align-items-center fw-bold bg-white py-1"), # Minimal padding
+        ], className="d-flex align-items-center fw-bold bg-white py-1",
+           style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
         dbc.CardBody([
             dcc.Graph(
                 figure=lagging_fig,
                 config={'displayModeBar': False}
             )
-        ], className="p-1", style={"height": "calc(100% - 38px)"}) # Fixed height minus header
+        ], className="p-1", style={"height": "calc(100% - 38px)"})
     ], className="shadow-sm border-0 h-100", style={"height": main_card_height})
     
     # ===== CARDS 3-6: Vendor Summary Cards =====
@@ -399,7 +415,8 @@ def create_overview_content(df, metrics):
                 showticklabels=False, # Hide labels to save space
                 showgrid=False,
                 zeroline=False
-            )
+            ),
+            font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif")  # Set Palatino Linotype font
         )
         
         # Get vendor's lagging clusters
@@ -425,7 +442,8 @@ def create_overview_content(df, metrics):
             dbc.CardHeader([
                 html.I(className="fas fa-building me-2", style={"color": DARK_GREEN}),
                 vendor_name
-            ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Minimal padding, smaller text
+            ], className="d-flex align-items-center fw-bold bg-white py-1", 
+               style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif", "fontSize": "0.9rem"}),
             dbc.CardBody([
                 # Two-column layout for better space usage
                 dbc.Row([
@@ -436,30 +454,41 @@ def create_overview_content(df, metrics):
                             dbc.Badge(
                                 f"{vendor_percent:.1f}%", 
                                 color="success" if vendor_percent > 50 else "warning",
-                                className="py-1 px-2 mb-1"
+                                className="py-1 px-2 mb-1",
+                                style={"fontSize": "0.9rem"} # Larger text
                             ),
                         ], className="text-center"),
                         
                         # Target/Remediated as inline text
                         html.Div([
                             html.Span(f"{vendor_remediated:,.0f}", 
-                                     style={"fontWeight": "500", "color": DARK_GREEN, "fontSize": "0.75rem"}),
-                            html.Span(" / ", className="mx-1", style={"fontSize": "0.75rem"}),
+                                     style={"fontWeight": "500", "color": DARK_GREEN, 
+                                            "fontSize": "0.85rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
+                            html.Span(" / ", className="mx-1", 
+                                     style={"fontSize": "0.85rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                             html.Span(f"{vendor_target:,.0f}", 
-                                     style={"fontWeight": "500", "fontSize": "0.75rem"})
-                        ], className="text-center small"),
+                                     style={"fontWeight": "500", "fontSize": "0.85rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                        ], className="text-center"),
                         
                         # Small label for MT
                         html.Div([
-                            html.Span("MT", className="text-muted", style={"fontSize": "0.7rem"})
+                            html.Span("MT", className="text-muted", 
+                                     style={"fontSize": "0.75rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                         ], className="text-center"),
                         
-                        # Lagging cluster in tiny text
+                        # Lagging cluster in slightly larger text
                         html.Div([
                             *[html.Div([
-                                html.Span("Lagging: ", className="text-muted", style={"fontSize": "0.7rem"}),
+                                html.Span("Lagging: ", className="text-muted", 
+                                         style={"fontSize": "0.75rem", 
+                                                "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                                 html.Span(f"{row['Cluster'].split()[0]}", 
-                                         style={"fontSize": "0.7rem", "fontWeight": "500"})
+                                         style={"fontSize": "0.75rem", "fontWeight": "500", 
+                                                "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                             ], className="text-center") for _, row in lagging_vendor_clusters.iterrows()]
                         ], className="mt-1")
                     ], xs=5, className="pe-0"),
@@ -467,7 +496,9 @@ def create_overview_content(df, metrics):
                     # Right column: Weekly chart
                     dbc.Col([
                         html.Div([
-                            html.Span("Weekly", className="text-muted", style={"fontSize": "0.7rem"})
+                            html.Span("Weekly", className="text-muted", 
+                                     style={"fontSize": "0.8rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                         ], className="text-center mb-1"),
                         
                         # Chart takes up remaining space
@@ -488,12 +519,14 @@ def create_overview_content(df, metrics):
             dbc.CardHeader([
                 html.I(className="fas fa-building me-2", style={"color": DARK_GREEN}),
                 "No Data"
-            ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Minimal padding, smaller text
+            ], className="d-flex align-items-center fw-bold bg-white py-1", 
+               style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif", "fontSize": "0.9rem"}),
             dbc.CardBody([
                 html.Div([
                     html.I(className="fas fa-exclamation-circle mb-2", 
                           style={"fontSize": "20px", "color": TEXT_MUTED}),
-                    html.P("No vendor data available", className="text-muted small mb-0")
+                    html.P("No vendor data available", className="text-muted mb-0", 
+                          style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                 ], className="d-flex flex-column justify-content-center align-items-center h-100")
             ], className="p-2", style={"height": "calc(100% - 31px)"}) # Fixed height minus header
         ], className="shadow-sm border-0 h-100", style={"height": vendor_card_height})
@@ -523,39 +556,15 @@ def create_overview_content(df, metrics):
             dbc.Col([vendor_cards[3]], xs=12, sm=6, md=3, className="mb-3")   # Increased margin
         ], className="g-3")  # Increased gutter
     ], fluid=True, className="p-0")  # Removed padding for better fit
-    
-    # Create optimized layout with cards in grid and more spacing
-    return dbc.Container([
-        # Top row - Overall Progress and Lagging Clusters side by side
-        dbc.Row([
-            # Card 1: Overall Progress Gauge
-            dbc.Col([card1], xs=12, md=6, className="mb-3"),  # Increased margin
-            
-            # Card 2: Lagging Clusters
-            dbc.Col([card2], xs=12, md=6, className="mb-3")  # Increased margin
-        ], className="g-3"),  # Increased gutter
-        
-        # Extra spacing between sections
-        html.Div(className="mb-2"),  # Added spacer
-        
-        # Bottom row - Vendor summary cards in a grid
-        dbc.Row([
-            # Cards 3-6: Vendor summary cards
-            dbc.Col([vendor_cards[0]], xs=12, sm=6, md=3, className="mb-3"),  # Increased margin
-            dbc.Col([vendor_cards[1]], xs=12, sm=6, md=3, className="mb-3"),  # Increased margin
-            dbc.Col([vendor_cards[2]], xs=12, sm=6, md=3, className="mb-3"),  # Increased margin
-            dbc.Col([vendor_cards[3]], xs=12, sm=6, md=3, className="mb-3")   # Increased margin
-        ], className="g-3")  # Increased gutter
-    ], fluid=True, className="p-0")  # Removed padding for better fit
+
 
 def create_vendor_content(df, vendor_name):
     """
-    Create an optimized grid layout for vendor-specific view with enhancements:
-    1. Added vendor name at the top
-    2. Centered gauge in progress card with legend
-    3. Added axis labels to charts
-    4. Improved padding between card rows
-    5. Reduced card sizes for better spacing
+    Create an optimized grid layout for vendor-specific view with UI improvements:
+    - Palatino Linotype font for better readability
+    - Properly displayed progress gauge with all markers
+    - Larger legends and labels
+    - Better spacing between cards
     
     Args:
         df (pandas.DataFrame): The dashboard data
@@ -574,7 +583,8 @@ def create_vendor_content(df, vendor_name):
                 html.Div([
                     html.I(className="fas fa-exclamation-triangle me-2", 
                           style={"fontSize": "2rem", "color":'#e74c3c'}),
-                    html.H2(f"No data available for {vendor_name}", className="mb-0")
+                    html.H2(f"No data available for {vendor_name}", 
+                           className="mb-0", style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                 ], className="d-flex align-items-center justify-content-center")
             ], className="py-4")
         ], className="shadow-sm border-0 my-2")
@@ -610,14 +620,15 @@ def create_vendor_content(df, vendor_name):
                 html.H3([
                     html.I(className="fas fa-building me-2", style={"color": DARK_GREEN}),
                     f"Vendor: {vendor_name}"
-                ], style={"color": DARK_GREEN, "fontSize": "1.4rem", "fontWeight": "600"}),
+                ], style={"color": DARK_GREEN, "fontSize": "1.5rem", "fontWeight": "600", 
+                          "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                 html.P([
                     f"Progress Summary: ",
                     html.Span(f"{percent_complete:.1f}% Complete", 
                              style={"fontWeight": "600", "color": DARK_GREEN}),
                     f" ({total_remediated:,.0f} MT of {total_target:,.0f} MT)"
-                ], className="mb-0", style={"fontSize": "0.9rem"})
-            ], className="bg-white p-2 rounded shadow-sm")
+                ], className="mb-0", style={"fontSize": "1rem", "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+            ], className="bg-white p-3 rounded shadow-sm") # Increased padding
         ], width=12)
     ], className="mb-4")  # More padding between sections
     
@@ -630,28 +641,37 @@ def create_vendor_content(df, vendor_name):
                 dbc.CardHeader([
                     html.I(className="fas fa-chart-pie me-2", style={"color": DARK_GREEN}),
                     f"{vendor_name} Progress"  # Added vendor name to header
-                ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Smaller text
+                ], className="d-flex align-items-center fw-bold bg-white py-1 small", 
+                   style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}), 
                 dbc.CardBody([
                     # Center the gauge and add legend
                     html.Div([
                         # Date info with reduced size
                         html.Div([
-                            html.Span("As of ", className="me-1 small text-muted"),
-                            html.Span(latest_date, style={"fontWeight": "500", "color": ACCENT_ORANGE, "fontSize": "0.75rem"})
-                        ], className="text-center mb-1"),
+                            html.Span("As of ", className="me-1 small text-muted", 
+                                     style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
+                            html.Span(latest_date, style={"fontWeight": "500", "color": ACCENT_ORANGE, 
+                                                          "fontSize": "0.85rem", 
+                                                          "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                        ], className="text-center mb-2"), # Increased margin
                         
-                        # Create gauge
-                        dcc.Graph(
-                            figure=create_progress_gauge(percent_complete),
-                            config={'displayModeBar': False},
-                            style={'height': '90px', 'width': '100%', 'margin': '0 auto'}  # Fixed width to 100%
-                        ),
+                        # Create gauge - explicitly centered and normal size
+                        html.Div([
+                            dcc.Graph(
+                                figure=create_progress_gauge(percent_complete),
+                                config={'displayModeBar': False},
+                                className="centered-gauge",
+                                style={'height': '140px', 'margin': '0 auto', 'display': 'block'} 
+                            )
+                        ], className="d-flex justify-content-center align-items-center gauge-container"),
                         
-                        # Legend below gauge - ADDED
+                        # Legend below gauge - LARGER
                         html.Div([
                             html.Span(f"{percent_complete:.1f}% of waste remediated", 
-                                     style={"fontWeight": "500", "color": DARK_GREEN, "fontSize": "0.9rem"})
-                        ], className="text-center mt-1")
+                                     style={"fontWeight": "500", "color": DARK_GREEN, 
+                                            "fontSize": "0.95rem", 
+                                            "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                        ], className="text-center mt-2")
                     ], className="d-flex flex-column justify-content-center align-items-center h-100 text-center")
                 ], className="p-2", style={"height": site_card_height})
             ], className="shadow-sm border-0 h-100", style={"height": fixed_card_height})
@@ -663,9 +683,10 @@ def create_vendor_content(df, vendor_name):
                 dbc.CardHeader([
                     html.I(className="fas fa-layer-group me-2", style={"color": DARK_GREEN}),
                     "Cluster Performance"
-                ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Smaller text
+                ], className="d-flex align-items-center fw-bold bg-white py-1 small", 
+                   style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}), 
                 dbc.CardBody([
-                    # Create cluster performance visualization
+                    # Create cluster performance visualization with improved fonts
                     create_cluster_performance_chart(vendor_df, latest_date_col)
                 ], className="p-2", style={"height": site_card_height})
             ], className="shadow-sm border-0 h-100", style={"height": fixed_card_height})
@@ -677,9 +698,10 @@ def create_vendor_content(df, vendor_name):
                 dbc.CardHeader([
                     html.I(className="fas fa-calendar-week me-2", style={"color": DARK_GREEN}),
                     "Weekly Progress"
-                ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Smaller text
+                ], className="d-flex align-items-center fw-bold bg-white py-1 small", 
+                   style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}), 
                 dbc.CardBody([
-                    # Create weekly progress chart
+                    # Create weekly progress chart with improved fonts
                     create_weekly_progress_chart(vendor_df, date_columns)
                 ], className="p-2", style={"height": site_card_height})
             ], className="shadow-sm border-0 h-100", style={"height": fixed_card_height})
@@ -698,7 +720,8 @@ def create_vendor_content(df, vendor_name):
                     dbc.CardHeader([
                         html.I(className="fas fa-map-marker-alt me-2", style={"color": DARK_GREEN}),
                         "Sites Progress"
-                    ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Smaller text
+                    ], className="d-flex align-items-center fw-bold bg-white py-1 small", 
+                       style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}), 
                     dbc.CardBody([
                         create_sites_performance_chart(vendor_df, latest_date_col, vendor_sites)
                     ], className="p-2", style={"height": site_card_height})
@@ -717,7 +740,8 @@ def create_vendor_content(df, vendor_name):
                     dbc.CardHeader([
                         html.I(className="fas fa-map-marker-alt me-2", style={"color": DARK_GREEN}),
                         f"Site: {site}"
-                    ], className="d-flex align-items-center fw-bold bg-white py-1 small"), # Smaller text
+                    ], className="d-flex align-items-center fw-bold bg-white py-1 small", 
+                       style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}), 
                     dbc.CardBody([
                         create_site_card_content(vendor_df, latest_date_col, site)
                     ], className="p-2", style={"height": site_card_height})
@@ -794,28 +818,29 @@ def create_cluster_performance_chart(vendor_df, latest_date_col):
         hovertemplate='%{y}: %{text}<extra></extra>'
     ))
     
-    # Optimize layout for compact display with axis labels
+    # Optimize layout for compact display with Palatino Linotype font labels - increased by 20%
     fig.update_layout(
-        margin=dict(l=10, r=10, t=5, b=20),  # Adjusted margins for labels
+        margin=dict(l=15, r=15, t=10, b=25),  # Slightly increased margins for larger labels
         paper_bgcolor='white',
         plot_bgcolor='white',
         showlegend=False,
         xaxis=dict(
             title='Completion Percentage',  # Added axis label
-            title_font=dict(size=9),  # Small title font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
             ticksuffix='%',
             range=[0, max(100, cluster_data['Percent Complete'].max() * 1.1)],
-            tickfont=dict(size=8),  # Smaller font
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             showgrid=True,
             gridcolor='rgba(0,0,0,0.05)'
         ),
         yaxis=dict(
             title='Cluster',  # Added axis label
-            title_font=dict(size=9),  # Small title font
-            tickfont=dict(size=8),  # Smaller font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             automargin=True  # Auto adjust margins
         ),
-        height=140  # Slightly reduced height
+        height=140,  # Maintain same height
+        font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif")  # Set Palatino Linotype font for all text
     )
     
     return dcc.Graph(
@@ -858,7 +883,8 @@ def create_weekly_progress_chart(vendor_df, date_columns):
     # If we have no data, return a message
     if weekly_df.empty:
         return html.Div("No weekly data available", 
-                       className="text-center text-muted d-flex justify-content-center align-items-center h-100")
+                       className="text-center text-muted d-flex justify-content-center align-items-center h-100",
+                       style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
     
     # Convert to date type and sort
     weekly_df['Date'] = pd.to_datetime(weekly_df['Date'])
@@ -885,26 +911,27 @@ def create_weekly_progress_chart(vendor_df, date_columns):
         hovertemplate='%{x}: %{y:.0f} MT<extra></extra>'
     ))
     
-    # Optimize layout with axis labels
+    # Optimize layout with Palatino Linotype font labels - increased by 20%
     fig.update_layout(
-        margin=dict(l=10, r=10, t=5, b=30),  # Adjusted margins for labels
+        margin=dict(l=15, r=15, t=10, b=35),  # Increased margins for larger labels
         paper_bgcolor='white',
         plot_bgcolor='white',
         showlegend=False,
         xaxis=dict(
             title='Date',  # Added axis label
-            title_font=dict(size=9),  # Small title font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
             tickangle=45,
-            tickfont=dict(size=8)  # Smaller font
+            tickfont=dict(size=12, family="Palatino Linotype")  # Increased by 20% (from 10 to 12)
         ),
         yaxis=dict(
             title='Daily MT',  # Added axis label
-            title_font=dict(size=9),  # Small title font
-            tickfont=dict(size=8),  # Smaller font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             showgrid=True,
             gridcolor='rgba(0,0,0,0.05)'
         ),
-        height=140  # Slightly reduced height
+        height=150,  # Slightly increased height to accommodate larger text
+        font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif")  # Set Palatino Linotype font for all text
     )
     
     return dcc.Graph(
@@ -961,26 +988,27 @@ def create_sites_performance_chart(vendor_df, latest_date_col, sites):
         hovertemplate='%{y}: %{text}<extra></extra>'
     ))
     
-    # Optimize layout with axis labels
+    # Optimize layout with Palatino Linotype font labels - increased by 20%
     fig.update_layout(
-        margin=dict(l=10, r=10, t=5, b=20),  # Adjusted margins for labels
+        margin=dict(l=15, r=15, t=10, b=25),  # Increased margins for larger labels
         paper_bgcolor='white',
         plot_bgcolor='white',
         showlegend=False,
         xaxis=dict(
             title='Completion Percentage',  # Added axis label
-            title_font=dict(size=9),  # Small title font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
             ticksuffix='%',
             range=[0, max(100, site_data['Percent Complete'].max() * 1.1)],
-            tickfont=dict(size=8)  # Smaller font
+            tickfont=dict(size=12, family="Palatino Linotype")  # Increased by 20% (from 10 to 12)
         ),
         yaxis=dict(
             title='ULB Site',  # Added axis label
-            title_font=dict(size=9),  # Small title font
-            tickfont=dict(size=8),  # Smaller font
+            title_font=dict(size=13, family="Palatino Linotype"),  # Increased by 20% (from 11 to 13)
+            tickfont=dict(size=12, family="Palatino Linotype"),  # Increased by 20% (from 10 to 12)
             automargin=True  # Auto adjust margins
         ),
-        height=140  # Slightly reduced height
+        height=150,  # Slightly increased height to accommodate larger text
+        font=dict(family="Palatino Linotype, Book Antiqua, Palatino, serif")  # Set Palatino Linotype font for all text
     )
     
     return dcc.Graph(
@@ -993,6 +1021,7 @@ def create_sites_performance_chart(vendor_df, latest_date_col, sites):
 def create_site_card_content(vendor_df, latest_date_col, site):
     """
     Create content for individual site card.
+    Updated with Palatino Linotype fonts and better spacing.
     
     Args:
         vendor_df (pandas.DataFrame): Vendor-specific data
@@ -1014,38 +1043,39 @@ def create_site_card_content(vendor_df, latest_date_col, site):
     if site_target > 0:
         site_percent = (site_remediated / site_target) * 100
     
-    # Create a simple metric display with progress bar
+    # Create a simple metric display with progress bar and Palatino Linotype fonts
     return html.Div([
         # Site metrics
         html.Div([
             html.Div([
-                html.Span("Target: ", className="text-muted small"),
+                html.Span("Target: ", className="text-muted",
+                         style={"fontSize": "0.9rem", "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                 html.Span(f"{site_target:,.0f} MT", 
-                         style={"fontWeight": "500"}, className="small")
-            ], className="mb-1"),
+                         style={"fontWeight": "500", "fontSize": "0.9rem", 
+                                "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+            ], className="mb-2"),  # Increased margin
             
             html.Div([
-                html.Span("Remediated: ", className="text-muted small"),
+                html.Span("Remediated: ", className="text-muted",
+                         style={"fontSize": "0.9rem", "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"}),
                 html.Span(f"{site_remediated:,.0f} MT", 
-                         style={"fontWeight": "500", "color": DARK_GREEN}, className="small")
-            ], className="mb-2"),
+                         style={"fontWeight": "500", "color": DARK_GREEN, 
+                                "fontSize": "0.9rem", "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+            ], className="mb-2"),  # Increased margin
             
-            # Progress bar
+            # Progress bar - slightly taller for better visibility
             html.Div([
                 dbc.Progress(
                     value=site_percent,
                     color="success" if site_percent > 50 else "warning",
                     className="mb-1",
-                    style={"height": "10px"}
+                    style={"height": "12px"}  # Slightly taller bar
                 ),
                 html.Div([
                     html.Span(f"{site_percent:.1f}% Complete", 
-                             style={"fontWeight": "500"}, className="small")
+                             style={"fontWeight": "500", "fontSize": "0.9rem", 
+                                    "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
                 ], className="text-end")
             ])
         ], className="p-1")
     ], className="d-flex flex-column justify-content-center h-100")
-
-
-
-
