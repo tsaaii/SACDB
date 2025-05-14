@@ -1,5 +1,5 @@
 """
-Updated layouts/main_layout.py with fixed public landing page components
+layouts/main_layout.py - Fixed to include auto-rotation-interval in all layouts
 """
 
 from dash import html, dcc
@@ -36,12 +36,19 @@ def create_main_layout():
         dcc.Location(id='url', refresh=False),
         html.Div(id='page-content'),
         
-        # Add interval component for auto-rotation on landing page
+        # Make sure the auto-rotation-interval is always in the layout
         dcc.Interval(
             id='auto-rotation-interval',
-            interval=60 * 1000,  # CHANGED: 60 seconds in milliseconds
+            interval=60 * 1000,  # 60 seconds in milliseconds
             n_intervals=0,
             disabled=True  # Initially disabled, enabled only on landing page
+        ),
+        
+        # Use a SINGLE interval for ALL clock updates
+        dcc.Interval(
+            id='clock-interval',
+            interval=1000,  # 1 second for real-time clock
+            n_intervals=0
         ),
         
         # Store component for rotation state
@@ -229,26 +236,18 @@ def create_public_landing_page():
     return html.Div(style={"backgroundColor": BG_COLOR, "minHeight": "100vh"}, children=[
         navbar,
         dbc.Container([
-            # Add a clock for TV display
-            html.Div(id="tv-clock", className="text-end mb-2", style={"fontSize": "1.2rem", "color": "#666"}),
+            # Add a clock for TV display - Using a div with id that won't conflict
+            html.Div(id="landing-tv-clock", className="text-end mb-2", style={"fontSize": "1.2rem", "color": "#666"}),
             
             hero_section,
             view_indicator,
             charts,
-                        
-            # Add interval for clock updates
-            dcc.Interval(
-            id='clock-interval',
-            interval=1000,  # 1 second for real-time clock
-            n_intervals=0
-            )
         ], className="py-2 px-2 px-sm-3", fluid=True),  # Use fluid container for full TV width
         create_footer()
     ])
 
 # URL routing callback function (implemented in callbacks/auth_callbacks.py)
 def display_page(pathname, is_authenticated):
-
     """
     Display the appropriate page based on URL and authentication state.
     """

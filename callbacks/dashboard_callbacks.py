@@ -1,5 +1,5 @@
 """
-Fixed callbacks/dashboard_callbacks.py with proper cross-filtering
+Fixed callbacks/dashboard_callbacks.py with unique clock ID
 """
 
 from dash import Input, Output, State, callback_context, dash_table, html
@@ -201,13 +201,14 @@ def register_dashboard_callbacks(app):
         
         return daily_fig, vendor_fig, cluster_fig, map_html, ulb_table
 
+    # Update dashboard clock with unique ID
     @app.callback(
-        Output('tv-clock', 'children'),
+        Output('dashboard-tv-clock', 'children'),
         [Input('clock-interval', 'n_intervals')]
     )
-    def update_clock(n_intervals):
+    def update_dashboard_clock(n_intervals):
         """
-        Update the clock display for TV mode.
+        Update the clock display for the dashboard.
         """
         from datetime import datetime
         current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')

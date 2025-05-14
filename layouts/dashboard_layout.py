@@ -44,6 +44,10 @@ def create_dashboard_layout():
                 html.P(f"Data as of {metrics['latest_date']}", className="lead"),
             ], className="mb-4"),
             
+            # Clock for dashboard - using unique ID to avoid conflicts
+            html.Div(id="dashboard-tv-clock", className="text-end mb-2 text-muted", 
+                    style={"fontSize": "1rem"}),
+            
             # Summary cards
             create_summary_cards(),
             
@@ -122,7 +126,10 @@ def create_dashboard_layout():
                     ], className="mb-4")
                 ], width=12)
             ])
-        ], className="mt-4")
+        ], className="mt-4"),
+        
+        # Add footer
+        create_footer()
     ])
 
 def create_navbar():
@@ -229,6 +236,7 @@ def create_summary_cards():
         ], md=4, className="mb-4")
     ], className="mb-4")
 
+
 def create_filters():
     """
     Create filter controls with improved initial state.
@@ -322,6 +330,7 @@ def create_filters():
             ])
         ], className="p-3")
     ], className="mb-4")
+
 
 def create_ulb_table(dataframe):
     """

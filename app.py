@@ -1,5 +1,5 @@
 """
-Updated app.py with data file monitoring
+Fixed version of app.py that eliminates duplicate callback issues
 """
 
 import dash
@@ -92,7 +92,6 @@ LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
 
 # Custom CSS
-# Custom CSS
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -139,7 +138,7 @@ app.layout = create_main_layout()
 # Register callbacks
 register_auth_callbacks(app)
 register_dashboard_callbacks(app)
-register_public_landing_callbacks(app)  # Add the public landing page callbacks
+register_public_landing_callbacks(app)  
 register_enhanced_public_callbacks(app)
 
 # Add endpoint to get last modified time

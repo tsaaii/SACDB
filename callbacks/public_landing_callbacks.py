@@ -1,5 +1,5 @@
 """
-Fixed public_landing_callbacks.py - pathname error
+Fixed public_landing_callbacks.py - fixed duplicate callback outputs
 """
 
 from dash import Input, Output, State, callback_context, html
@@ -39,6 +39,7 @@ def register_public_landing_callbacks(app):
     metrics = get_dashboard_metrics(df)
     
     # Enable/disable auto-rotation based on the current page
+    # This is the original callback that needs to be kept (others should use allow_duplicate=True)
     @app.callback(
         Output('auto-rotation-interval', 'disabled'),
         [Input('url', 'pathname')]
@@ -233,7 +234,7 @@ def register_public_landing_callbacks(app):
         
         return daily_fig, vendor_fig, cluster_fig
     
-    # Update clock in real-time
+    # Update clock in real-time with allow_duplicate=True to fix the conflict
     @app.callback(
         Output('tv-clock', 'children', allow_duplicate=True),
         [Input('clock-interval', 'n_intervals')],
@@ -501,6 +502,7 @@ def register_public_landing_callbacks(app):
             fig = go.Figure()
             fig.update_layout(title=f"Error creating heatmap")
             return fig
+
     def update_clock(n_intervals):
         """
     Update the clock display for TV mode.

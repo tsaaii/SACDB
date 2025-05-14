@@ -102,9 +102,11 @@ def register_enhanced_public_callbacks(app):
                 return create_vendor_content(df, vendors[next_vendor_index]), new_state
     
     # Disable auto-rotation when not on the landing page
+    # Added allow_duplicate=True to fix the duplicate output error
     @app.callback(
-        Output('auto-rotation-interval', 'disabled'),
-        [Input('url', 'pathname')]
+        Output('auto-rotation-interval', 'disabled', allow_duplicate=True),
+        [Input('url', 'pathname')],
+        prevent_initial_call=True
     )
     def toggle_auto_rotation(pathname):
         """
