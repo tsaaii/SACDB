@@ -57,19 +57,22 @@ def register_public_landing_callbacks(app):
         return pathname != '/'
     
     # Update rotation state
+    # Update rotation state with smarter cycle logic
     @app.callback(
         [Output('rotation-state', 'data'),
-        Output('public-vendor-filter', 'data'),
-        Output('public-cluster-filter', 'data'),
-        Output('current-vendor-display', 'children'),
-        Output('current-cluster-display', 'children')],
+         Output('public-vendor-filter', 'data'),
+         Output('public-cluster-filter', 'data'),
+         Output('current-vendor-display', 'children'),
+         Output('current-cluster-display', 'children')],
         [Input('auto-rotation-interval', 'n_intervals'),
-        Input('url', 'pathname')],  # Added this input
+         Input('url', 'pathname')],
         [State('rotation-state', 'data')]
     )
-    def update_rotation_state(n_intervals, pathname, current_state):  # Update the function parameters
+    def update_rotation_state(n_intervals, pathname, current_state):
         """
-        Update rotation state to cycle through vendors and clusters.
+        Update rotation state to cycle through vendors and clusters intelligently.
+        This rotates through all valid vendor-cluster combinations to show
+        the full range of data.
         
         Args:
             n_intervals (int): Number of interval triggers
@@ -82,51 +85,65 @@ def register_public_landing_callbacks(app):
         # Skip updates if not on the landing page
         if pathname != '/':
             raise dash.exceptions.PreventUpdate
+        
+        # Build a mapping of vendors to their clusters
+        vendor_cluster_map = {}
+        for vendor in all_vendors:
+            vendor_df = df[df['Vendor'] == vendor]
+            vendor_cluster_map[vendor] = sorted(vendor_df['Cluster'].unique())
+        
+        # Initialize state if needed
+        if n_intervals is None or not current_state:
+            # Initial state
+            vendor = all_vendors[0] if all_vendors else "All"
+            clusters = vendor_cluster_map.get(vendor, [])
+            cluster = clusters[0] if clusters else "All"
             
-        # Rest of your function's code remains the same
-        if n_intervals is None or not all_vendors or not all_clusters:
-            # Initial state or no data
             return (
-                {'vendor_index': 0, 'cluster_index': 0},
-                [all_vendors[0]] if all_vendors else [],
-                [all_clusters[0]] if all_clusters else [],
-                all_vendors[0] if all_vendors else "All",
-                all_clusters[0] if all_clusters else "All"
+                {'vendor_index': 0, 'cluster_index': 0, 'combo_index': 0},
+                [vendor],
+                [cluster],
+                vendor,
+                cluster
             )
         
-        # Get current indices
-        vendor_index = current_state.get('vendor_index', 0)
-        cluster_index = current_state.get('cluster_index', 0)
+        # Build a flat list of all vendor-cluster combinations
+        all_combos = []
+        for v_idx, vendor in enumerate(all_vendors):
+            clusters = vendor_cluster_map.get(vendor, [])
+            for c_idx, cluster in enumerate(clusters):
+                all_combos.append({
+                    'vendor_index': v_idx,
+                    'cluster_index': c_idx,
+                    'vendor': vendor,
+                    'cluster': cluster
+                })
         
-        # Determine rotation scheme
-        # Every 3 rotations, show a different vendor
-        # Within each vendor, cycle through clusters
-        if n_intervals % 3 == 0:
-            # Time to change vendor
-            vendor_index = (vendor_index + 1) % len(all_vendors)
-            cluster_index = 0  # Reset cluster index when vendor changes
-        else:
-            # Just change cluster
-            cluster_index = (cluster_index + 1) % len(all_clusters)
+        # Get the current combo index, defaulting to 0
+        combo_index = current_state.get('combo_index', 0)
+        
+        # Move to the next combination
+        combo_index = (combo_index + 1) % len(all_combos)
+        
+        # Get the current combination
+        current_combo = all_combos[combo_index]
+        vendor = current_combo['vendor']
+        cluster = current_combo['cluster']
         
         # Update state
         new_state = {
-            'vendor_index': vendor_index,
-            'cluster_index': cluster_index
+            'vendor_index': current_combo['vendor_index'],
+            'cluster_index': current_combo['cluster_index'],
+            'combo_index': combo_index
         }
         
-        # Get current vendor and cluster
-        current_vendor = all_vendors[vendor_index]
-        current_cluster = all_clusters[cluster_index]
-        
         return (
-            new_state,  # Updated rotation state
-            [current_vendor],  # Vendor filter value
-            [current_cluster],  # Cluster filter value
-            current_vendor,  # Vendor display text
-            current_cluster   # Cluster display text
+            new_state,         # Updated rotation state
+            [vendor],          # Vendor filter value
+            [cluster],         # Cluster filter value
+            vendor,            # Vendor display text
+            cluster            # Cluster display text
         )
-    
     # Update public progress gauge
     @app.callback(
         Output('public-progress-gauge', 'figure'),
@@ -149,15 +166,24 @@ def register_public_landing_callbacks(app):
         # Get latest metrics
         metrics = get_dashboard_metrics(df)
         
-        # Create progress gauge
-        return create_progress_gauge(metrics['percent_complete'])
+        # Create progress gauge - make it responsive
+        fig = create_progress_gauge(metrics['percent_complete'])
+        
+        # Ensure it works better on mobile
+        fig.update_layout(
+            margin=dict(l=10, r=10, t=10, b=10),
+            autosize=True,
+        )
+        
+        return fig
     
     # Update all public charts based on current filters
+
+# Update all public charts based on current filters
     @app.callback(
         [Output('public-daily-progress-chart', 'figure'),
          Output('public-vendor-comparison-chart', 'figure'),
-         Output('public-cluster-heatmap', 'figure'),
-         Output('public-remediation-map', 'srcDoc')],
+         Output('public-cluster-heatmap', 'figure')],
         [Input('public-vendor-filter', 'data'),
          Input('public-cluster-filter', 'data')]
     )
@@ -170,7 +196,7 @@ def register_public_landing_callbacks(app):
             clusters (list): Selected clusters
             
         Returns:
-            tuple: (daily_fig, vendor_fig, cluster_fig, map_html)
+            tuple: (daily_fig, vendor_fig, cluster_fig)
         """
         # Start with the full dataset
         filtered_df = df.copy()
@@ -194,10 +220,29 @@ def register_public_landing_callbacks(app):
         # Create cluster heatmap
         cluster_fig = create_cluster_heatmap(filtered_df)
         
-        # Create map
-        map_html = create_remediation_map(filtered_df)
+        # Enhance mobile responsiveness for all charts
+        for fig in [daily_fig, vendor_fig, cluster_fig]:
+            # Reduce margins for mobile
+            fig.update_layout(
+                margin=dict(l=10, r=10, t=40, b=40),
+                autosize=True,
+                legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="center", x=0.5)
+            )
+            
+            # Adjust axis labels for better mobile view
+            fig.update_xaxes(
+                title_font=dict(size=12),
+                tickfont=dict(size=10),
+                title_standoff=5
+            )
+            
+            fig.update_yaxes(
+                title_font=dict(size=12),
+                tickfont=dict(size=10),
+                title_standoff=5
+            )
         
-        return daily_fig, vendor_fig, cluster_fig, map_html
+        return daily_fig, vendor_fig, cluster_fig
     
     # Helper function to create daily progress chart
     def create_daily_progress_chart(dataframe):
@@ -362,14 +407,14 @@ def register_public_landing_callbacks(app):
                 x=vendor_stats['Vendor'],
                 y=vendor_stats['Quantity to be remediated in MT'],
                 name='Target',
-                marker_color='lightgray'
+                marker_color='#8B4513'  # SaddleBrown color
             ))
             
             fig.add_trace(go.Bar(
                 x=vendor_stats['Vendor'],
                 y=vendor_stats[latest_date_col],
                 name='Completed',
-                marker_color=EMERALD
+                marker_color='#2E8B57'  # SeaGreen color
             ))
             
             fig.update_layout(

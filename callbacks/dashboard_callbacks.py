@@ -237,6 +237,20 @@ def register_dashboard_callbacks(app):
             print(f"Error in create_ulb_table: {e}")
             return html.Div(f"Error creating table: {str(e)}", style={'padding': '20px', 'textAlign': 'center'})
 
+
+    @app.callback(
+        Output('tv-clock', 'children'),
+        [Input('clock-interval', 'n_intervals')]
+    )
+    def update_clock(n_intervals):
+        """
+        Update the clock display for TV mode.
+        """
+        from datetime import datetime
+        current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')
+        return current_time
+
+
     # Define the callbacks here...
     @app.callback(
         [Output('cluster-filter', 'options'),
@@ -249,7 +263,8 @@ def register_dashboard_callbacks(app):
     )
     def update_filter_options(selected_vendors, selected_clusters, selected_sites):
         """
-        Update filter options based on selections.
+        Update filter options based on selections, implementing cross-filtering
+        to show only relevant options based on current selections.
         """
         ctx = callback_context
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
@@ -278,15 +293,40 @@ def register_dashboard_callbacks(app):
         site_options = [{'label': site, 'value': site} for site in available_sites]
         
         # Adjust selected values if they're no longer in the options
-        if selected_clusters:
-            cluster_value = [c for c in selected_clusters if c in available_clusters]
-        else:
+        if trigger_id == 'vendor-filter':
+            # If vendor changed, reset clusters to those available for the vendor
+            filtered_cluster_options = [c['value'] for c in cluster_options]
+            if selected_clusters:
+                cluster_value = [c for c in selected_clusters if c in filtered_cluster_options]
+            else:
+                cluster_value = filtered_cluster_options if len(filtered_cluster_options) <= 3 else filtered_cluster_options[:3]
+                
+            # Also reset site values based on new vendor+cluster combination
+            filtered_site_options = [s['value'] for s in site_options]
+            site_value = filtered_site_options if len(filtered_site_options) <= 5 else filtered_site_options[:5]
+        elif trigger_id == 'cluster-filter':
+            # Keep selected clusters if possible
             cluster_value = selected_clusters
-        
-        if selected_sites:
-            site_value = [s for s in selected_sites if s in available_sites]
+            
+            # Update sites based on selected clusters
+            filtered_site_options = [s['value'] for s in site_options]
+            if selected_sites:
+                site_value = [s for s in selected_sites if s in filtered_site_options]
+            else:
+                site_value = filtered_site_options if len(filtered_site_options) <= 5 else filtered_site_options[:5]
         else:
-            site_value = selected_sites
+            # For other triggers, try to keep selections if valid
+            filtered_cluster_options = [c['value'] for c in cluster_options]
+            if selected_clusters:
+                cluster_value = [c for c in selected_clusters if c in filtered_cluster_options]
+            else:
+                cluster_value = selected_clusters
+                
+            filtered_site_options = [s['value'] for s in site_options]
+            if selected_sites:
+                site_value = [s for s in selected_sites if s in filtered_site_options]
+            else:
+                site_value = selected_sites
         
         return cluster_options, cluster_value, site_options, site_value
 
@@ -547,14 +587,14 @@ def register_dashboard_callbacks(app):
                 x=vendor_stats['Vendor'],
                 y=vendor_stats['Quantity to be remediated in MT'],
                 name='Target',
-                marker_color='lightgray'
+                marker_color='#8B4513'  # SaddleBrown color
             ))
             
             fig.add_trace(go.Bar(
                 x=vendor_stats['Vendor'],
                 y=vendor_stats[latest_date_col],
                 name='Completed',
-                marker_color=EMERALD
+                marker_color='#2E8B57'  # SeaGreen color
             ))
             
             fig.update_layout(

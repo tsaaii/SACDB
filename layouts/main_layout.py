@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 from layouts.login_layout import create_login_layout
 from layouts.dashboard_layout import create_dashboard_layout
 from data_processing import load_data, get_dashboard_metrics
+from layouts.footer import create_footer
 
 # Define theme colors
 EMERALD = "#2ecc71"
@@ -33,30 +34,20 @@ def create_main_layout():
             disabled=True  # Initially disabled, enabled only on landing page
         ),
         
-        # Store components
+        # Store components for public landing page
         dcc.Store(id='rotation-state', data={'vendor_index': 0, 'cluster_index': 0}),
         dcc.Store(id='public-vendor-filter', data=[]),
         dcc.Store(id='public-cluster-filter', data=[]),
         
-        # Hidden components for public landing page
-        html.Div([
-            # Display components
-            html.Span(id='current-vendor-display', children=''),
-            html.Span(id='current-cluster-display', children=''),
-            
-            # Chart placeholders - Make sure to use the correct component types
-            dcc.Graph(id='public-progress-gauge', figure={}),
-            dcc.Graph(id='public-daily-progress-chart', figure={}),
-            dcc.Graph(id='public-vendor-comparison-chart', figure={}),
-            dcc.Graph(id='public-cluster-heatmap', figure={}),
-            
-            # Important: Use html.Iframe for srcDoc property
-            html.Iframe(id='public-remediation-map', srcDoc='')
-        ], style={'display': 'none'})
+        # Display components for public landing page
+        html.Span(id='current-vendor-display', style={'display': 'none'}),
+        html.Span(id='current-cluster-display', style={'display': 'none'}),
     ])
+
 def create_public_landing_page():
     """
-    Create the public landing page with auto-rotating dashboard.
+    Create the public landing page with auto-rotating dashboard,
+    optimized for both TV displays and mobile viewing.
     
     Returns:
         dash component: The public landing page
@@ -69,13 +60,13 @@ def create_public_landing_page():
     vendors = sorted(df['Vendor'].unique())
     clusters = sorted(df['Cluster'].unique())
     
-    # Custom navbar for landing page with login button
+    # Custom navbar for landing page with login button and large logo for TV visibility
     navbar = dbc.Navbar(
         dbc.Container([
             html.A(
                 dbc.Row([
-                    #dbc.Col(html.I(className="fas fa-leaf", style={"fontSize": "24px"}), width="auto"),
-                    dbc.Col(dbc.NavbarBrand("Swaccha Andhra", style={"color": "white", "fontWeight": "bold"}), width="auto")
+                    dbc.Col(html.I(className="fas fa-leaf", style={"fontSize": "28px", "color": "white"}), width="auto"),
+                    dbc.Col(dbc.NavbarBrand("Swaccha Andhra", style={"color": "white", "fontWeight": "bold", "fontSize": "24px"}), width="auto")
                 ], align="center", className="g-0"),
                 href="/",
                 style={"textDecoration": "none"}
@@ -86,8 +77,8 @@ def create_public_landing_page():
                         "Login", 
                         id="login-nav-button", 
                         color="light", 
-                        size="sm", 
-                        className="ms-2",
+                        size="md",  # Larger button for TV/touch 
+                        className="ms-2 fw-bold",
                         href="/login"
                     )
                 ),
@@ -95,152 +86,167 @@ def create_public_landing_page():
         ]),
         color=DARK_GREEN,
         dark=True,
-        className="mb-4"
+        className="mb-2 py-2"  # Slightly thicker navbar
     )
     
-    # Summary cards
-    summary_cards = dbc.Row([
-        # Total target card
+    # Summary section - Hero area with big progress gauge and headline stats (TV-optimized)
+    hero_section = dbc.Row([
         dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("Total Waste Target", className="card-title"),
-                    html.H2(f"{metrics['total_to_remediate']:,.0f} MT", className="text-primary"),
-                    html.P("Total waste to be remediated", className="card-text text-muted")
-                ])
-            ], className="text-center border-0 shadow-sm h-100")
-        ], md=4),
-        
-        # Remediated card
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("Remediated So Far", className="card-title"),
-                    html.H2(f"{metrics['total_remediated']:,.0f} MT", className="text-success"),
-                    html.P(f"As of {metrics['latest_date']}", className="card-text text-muted")
-                ])
-            ], className="text-center border-0 shadow-sm h-100")
-        ], md=4),
-        
-        # Progress card
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("Overall Progress", className="card-title"),
+            html.Div([
+                html.H1("Swaccha Andhra Progress", 
+                        className="display-4 text-center mb-2",
+                        style={"fontSize": "3.5rem", "fontWeight": "bold"}),  # Larger for TV
+                html.P(f"Data as of {metrics['latest_date']}", 
+                       className="lead text-center mb-3",
+                       style={"fontSize": "1.5rem"}),  # Larger for TV
+                html.Div([
                     dcc.Graph(
                         id='public-progress-gauge',
                         config={'displayModeBar': False},
-                        style={'height': '100px'}
+                        style={'height': '200px'}  # Taller gauge for TV
                     ),
-                    html.P(f"{metrics['percent_complete']:.1f}% Complete", className="card-text text-center")
-                ])
-            ], className="text-center border-0 shadow-sm h-100")
-        ], md=4)
-    ], className="mb-4")
+                ], className="text-center mb-2"),
+                html.H3(f"{metrics['percent_complete']:.1f}% Complete", 
+                        className="text-center mb-3",
+                        style={"fontSize": "2.5rem", "fontWeight": "bold"}),  # Larger for TV
+                
+                dbc.Row([
+                    dbc.Col([
+                        html.Div([
+                            html.H2(f"{metrics['total_to_remediate']:,.0f}", 
+                                   className="mb-0",
+                                   style={"fontSize": "2.2rem", "fontWeight": "bold"}),  # Larger for TV
+                            html.P("Target (MT)", 
+                                  className="text-muted",
+                                  style={"fontSize": "1.2rem"})  # Larger for TV
+                        ], className="text-center")
+                    ], md=6),
+                    dbc.Col([
+                        html.Div([
+                            html.H2(f"{metrics['total_remediated']:,.0f}", 
+                                   className="mb-0",
+                                   style={"fontSize": "2.2rem", "fontWeight": "bold", "color": "#2E8B57"}),  # Larger for TV
+                            html.P("Remediated (MT)", 
+                                  className="text-muted",
+                                  style={"fontSize": "1.2rem"})  # Larger for TV
+                        ], className="text-center")
+                    ], md=6),
+                ], className="mb-3")
+            ], className="py-4 px-3 bg-white rounded shadow-sm")
+        ], md=12, lg=12)
+    ], className="mb-3")
     
-    # Current view indicator
+    # Current view indicator - Enlarged for TV display
     view_indicator = dbc.Card([
         dbc.CardBody([
-            html.H4("Currently Viewing", className="card-title text-center mb-3"),
+            html.H4("Currently Viewing", 
+                   className="card-title text-center mb-3",
+                   style={"fontSize": "2rem", "fontWeight": "bold"}),  # Larger for TV
             dbc.Row([
                 dbc.Col([
                     html.Div([
-                        html.Label("Vendor:", className="fw-bold me-2"),
-                        html.Span(id="current-vendor-display", children=vendors[0] if vendors else "All")
+                        html.Label("Vendor:", className="fw-bold me-2", style={"fontSize": "1.3rem"}),  # Larger for TV
+                        html.Span(id="current-vendor-display", 
+                                 children=vendors[0] if vendors else "All",
+                                 style={"fontSize": "1.3rem", "fontWeight": "bold", "color": "#2E8B57"})  # Highlight with color
                     ], className="d-flex align-items-center justify-content-center mb-2")
                 ], md=6),
                 dbc.Col([
                     html.Div([
-                        html.Label("Cluster:", className="fw-bold me-2"),
-                        html.Span(id="current-cluster-display", children=clusters[0] if clusters else "All")
+                        html.Label("Cluster:", className="fw-bold me-2", style={"fontSize": "1.3rem"}),  # Larger for TV
+                        html.Span(id="current-cluster-display", 
+                                 children=clusters[0] if clusters else "All",
+                                 style={"fontSize": "1.3rem", "fontWeight": "bold", "color": "#8B4513"})  # Highlight with color
                     ], className="d-flex align-items-center justify-content-center mb-2")
                 ], md=6)
             ]),
             html.P("Dashboard auto-rotates every 15 seconds. Login for interactive controls.", 
-                   className="text-center text-muted mt-2 mb-0")
+                   className="text-center text-muted mt-2 mb-0",
+                   style={"fontSize": "1.2rem"})  # Larger for TV
         ])
-    ], className="mb-4 border-0 shadow-sm")
+    ], className="mb-3 border-0 shadow-sm")
     
-    # Main charts
+    # Main charts - TV optimized
     charts = dbc.Row([
-        # Daily progress chart
+        # Daily progress chart - Full width for emphasis and readability on TV
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader(html.H5("Daily Remediation Progress")),
+                dbc.CardHeader(html.H5("Daily Remediation Progress", 
+                                      style={"fontSize": "1.5rem", "fontWeight": "bold"})),  # Larger for TV
                 dbc.CardBody([
                     dcc.Graph(
                         id='public-daily-progress-chart',
-                        config={'displayModeBar': False},
-                        style={'height': '300px'}
+                        config={'displayModeBar': False, 'responsive': True},
+                        style={'height': '350px'}  # Taller for TV
                     )
-                ])
-            ], className="mb-4 shadow-sm border-0")
+                ], className="p-2")  # Reduced padding for more chart space
+            ], className="mb-3 shadow-sm border-0")
         ], md=12),
         
-        # Vendor comparison
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader(html.H5("Vendor Performance")),
-                dbc.CardBody([
-                    dcc.Graph(
-                        id='public-vendor-comparison-chart',
-                        config={'displayModeBar': False},
-                        style={'height': '300px'}
-                    )
-                ])
-            ], className="mb-4 shadow-sm border-0")
-        ], md=6),
-        
-        # Cluster heatmap
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader(html.H5("Cluster Progress")),
-                dbc.CardBody([
-                    dcc.Graph(
-                        id='public-cluster-heatmap',
-                        config={'displayModeBar': False},
-                        style={'height': '300px'}
-                    )
-                ])
-            ], className="mb-4 shadow-sm border-0")
-        ], md=6),
-        
-        # Map visualization
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader(html.H5("Geographic Remediation Status")),
-                dbc.CardBody([
-                    html.Div(id='public-map-container', children=[
-                        html.Iframe(
-                            id='public-remediation-map',
-                            style={'width': '100%', 'height': '400px', 'border': 'none'}
+        # Vendor comparison and Cluster heatmap in a single row - optimized for glanceability on TV
+        dbc.Row([
+            # Vendor comparison
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H5("Vendor Performance", 
+                                          style={"fontSize": "1.5rem", "fontWeight": "bold"})),  # Larger for TV
+                    dbc.CardBody([
+                        dcc.Graph(
+                            id='public-vendor-comparison-chart',
+                            config={'displayModeBar': False, 'responsive': True},
+                            style={'height': '300px'}  # Taller for TV
                         )
-                    ])
-                ])
-            ], className="mb-4 shadow-sm border-0")
-        ], md=12),
+                    ], className="p-2")  # Reduced padding for more chart space
+                ], className="h-100 shadow-sm border-0")
+            ], md=12, lg=6, className="mb-3"),
+            
+            # Cluster heatmap
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardHeader(html.H5("Cluster Progress", 
+                                          style={"fontSize": "1.5rem", "fontWeight": "bold"})),  # Larger for TV
+                    dbc.CardBody([
+                        dcc.Graph(
+                            id='public-cluster-heatmap',
+                            config={'displayModeBar': False, 'responsive': True},
+                            style={'height': '300px'}  # Taller for TV
+                        )
+                    ], className="p-2")  # Reduced padding for more chart space
+                ], className="h-100 shadow-sm border-0")
+            ], md=12, lg=6, className="mb-3")
+        ])
     ])
-    
-    # Hidden stored values for current selections
-    current_selections = html.Div([
-        dcc.Store(id='public-vendor-filter', data=[vendors[0]] if vendors else []),
-        dcc.Store(id='public-cluster-filter', data=[clusters[0]] if clusters else [])
-    ], style={'display': 'none'})
     
     # Combine into full layout
     return html.Div(style={"backgroundColor": BG_COLOR, "minHeight": "100vh"}, children=[
         navbar,
         dbc.Container([
-            html.H1("Swaccha Andhra Waste Remediation Dashboard", 
-                    className="my-4 text-center", 
-                    style={"color": DARK_GREEN}),
-            html.P(f"Data as of {metrics['latest_date']}", 
-                   className="lead text-center mb-4"),
-            summary_cards,
+            # Add a clock for TV display
+            html.Div(id="tv-clock", className="text-end mb-2", style={"fontSize": "1.2rem", "color": "#666"}),
+            
+            hero_section,
             view_indicator,
             charts,
-            current_selections
-        ], className="py-4")
+            
+            # Store components
+            dcc.Store(id='public-vendor-filter', data=[vendors[0]] if vendors else []),
+            dcc.Store(id='public-cluster-filter', data=[clusters[0]] if clusters else []),
+            
+            # Progress gauge for callback
+            dcc.Graph(id='public-progress-gauge', style={'display': 'none'}),
+            # Chart placeholders
+            dcc.Graph(id='public-daily-progress-chart', style={'display': 'none'}),
+            dcc.Graph(id='public-vendor-comparison-chart', style={'display': 'none'}),
+            dcc.Graph(id='public-cluster-heatmap', style={'display': 'none'}),
+            
+            # Add interval for clock updates
+            dcc.Interval(
+                id='clock-interval',
+                interval=1000,  # 1 second
+                n_intervals=0
+            )
+        ], className="py-2 px-2 px-sm-3", fluid=True),  # Use fluid container for full TV width
+        create_footer()
     ])
 
 # URL routing callback function (implemented in callbacks/auth_callbacks.py)

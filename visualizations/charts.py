@@ -219,14 +219,14 @@ def create_vendor_comparison(dataframe):
             x=vendor_stats['Vendor'],
             y=vendor_stats['Quantity to be remediated in MT'],
             name='Target',
-            marker_color='lightgray'
+            marker_color='#8B4513'
         ))
         
         fig.add_trace(go.Bar(
             x=vendor_stats['Vendor'],
             y=vendor_stats[latest_date_col],
             name='Completed',
-            marker_color=EMERALD
+            marker_color='#2E8B57'
         ))
         
         fig.update_layout(

@@ -78,4 +78,4 @@ def register_auth_callbacks(app):
         """
         if n_clicks:
             logout_user()
-        return '/login'
+        return '/'

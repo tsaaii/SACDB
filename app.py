@@ -90,15 +90,22 @@ LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
 
 # Custom CSS
+# Custom CSS
 app.index_string = '''
 <!DOCTYPE html>
 <html>
     <head>
         {%metas%}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#27ae60">
+        <meta name="description" content="Swaccha Andhra Corporation Waste Remediation Dashboard">
         <title>Swaccha Andhra Corporation</title>
         {%favicon%}
         {%css%}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="manifest" href="/assets/manifest.json">
+        <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
     </head>
     <body>
         {%app_entry%}
@@ -107,6 +114,19 @@ app.index_string = '''
             {%scripts%}
             {%renderer%}
         </footer>
+        <script>
+            // Register the service worker for PWA
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/assets/service-worker.js')
+                        .then(function(registration) {
+                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        }, function(err) {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
+            }
+        </script>
     </body>
 </html>
 '''

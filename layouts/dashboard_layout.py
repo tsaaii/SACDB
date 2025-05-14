@@ -12,6 +12,8 @@ from visualizations.charts import (
     create_vendor_comparison, create_cluster_heatmap
 )
 from visualizations.maps import create_remediation_map
+from layouts.footer import create_footer
+
 
 # Define green theme colors
 EMERALD = "#2ecc71"
@@ -364,3 +366,106 @@ def create_ulb_table(dataframe):
         hover=True,
         responsive=True
     )
+
+def create_dashboard_layout():
+    """
+    Create the dashboard layout with visualizations.
+    
+    Returns:
+        dash component: The dashboard layout
+    """
+    return html.Div([
+        # Navbar
+        create_navbar(),
+        
+        # Main content
+        dbc.Container([
+            # Welcome message and date
+            html.Div([
+                html.H1("Swaccha Andhra Dashboard", className="my-4", style={"color": DARK_GREEN}),
+                html.P(f"Data as of {metrics['latest_date']}", className="lead"),
+            ], className="mb-4"),
+            
+            # Summary cards
+            create_summary_cards(),
+            
+            # Filters
+            create_filters(),
+            
+            # Charts
+            dbc.Row([
+                # Daily progress chart
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(html.H5("Daily Remediation Progress")),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='daily-progress-chart',
+                                figure=create_daily_progress_chart(df),
+                                style={'height': '300px'}
+                            )
+                        ])
+                    ], className="mb-4")
+                ], width=12),
+                
+                # Vendor comparison
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(html.H5("Vendor Performance")),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='vendor-comparison-chart',
+                                figure=create_vendor_comparison(metrics['vendor_stats']),
+                                style={'height': '300px'}
+                            )
+                        ])
+                    ], className="mb-4")
+                ], width=6),
+                
+                # Cluster heatmap
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(html.H5("Cluster Progress")),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='cluster-heatmap',
+                                figure=create_cluster_heatmap(df),
+                                style={'height': '300px'}
+                            )
+                        ])
+                    ], className="mb-4")
+                ], width=6),
+                
+                # Map visualization
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(html.H5("Geographic Remediation Status")),
+                        dbc.CardBody([
+                            html.Div(id='map-container', children=[
+                                html.Iframe(
+                                    id='remediation-map',
+                                    srcDoc=create_remediation_map(df),
+                                    style={'width': '100%', 'height': '400px', 'border': 'none'}
+                                )
+                            ])
+                        ])
+                    ], className="mb-4")
+                ], width=12),
+                
+                # ULB detailed data
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(html.H5("ULB Details")),
+                        dbc.CardBody([
+                            html.Div(id='ulb-details-table', children=[
+                                create_ulb_table(df)
+                            ])
+                        ])
+                    ], className="mb-4")
+                ], width=12)
+            ])
+        ], className="mt-4"),
+        
+        # Add footer
+        create_footer()
+    ])
