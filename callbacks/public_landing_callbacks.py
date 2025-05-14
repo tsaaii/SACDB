@@ -1,8 +1,8 @@
 """
-callbacks/public_landing_callbacks.py - Auto-rotating public landing page callbacks
+Fixed public_landing_callbacks.py - pathname error
 """
 
-from dash import Input, Output, State, callback_context
+from dash import Input, Output, State, callback_context, html
 import dash
 import pandas as pd
 import plotly.express as px
@@ -46,22 +46,13 @@ def register_public_landing_callbacks(app):
     def toggle_rotation_interval(pathname):
         """
         Enable auto-rotation only on the public landing page.
-        
-        Args:
-            pathname (str): Current URL path
-            
-        Returns:
-            bool: Whether the interval should be disabled
         """
         # Enable auto-rotation only on the landing page
         return pathname != '/'
     
-    # Update rotation state
     # Update rotation state with smarter cycle logic
     @app.callback(
         [Output('rotation-state', 'data'),
-         Output('public-vendor-filter', 'data'),
-         Output('public-cluster-filter', 'data'),
          Output('current-vendor-display', 'children'),
          Output('current-cluster-display', 'children')],
         [Input('auto-rotation-interval', 'n_intervals'),
@@ -73,17 +64,13 @@ def register_public_landing_callbacks(app):
         Update rotation state to cycle through vendors and clusters intelligently.
         This rotates through all valid vendor-cluster combinations to show
         the full range of data.
-        
-        Args:
-            n_intervals (int): Number of interval triggers
-            pathname (str): Current URL path
-            current_state (dict): Current rotation state
-                
-        Returns:
-            tuple: (rotation_state, vendor_filter, cluster_filter, vendor_display, cluster_display)
         """
         # Skip updates if not on the landing page
         if pathname != '/':
+            raise dash.exceptions.PreventUpdate
+        
+        # Skip updates if n_intervals is None (initial load)
+        if n_intervals is None:
             raise dash.exceptions.PreventUpdate
         
         # Build a mapping of vendors to their clusters
@@ -93,16 +80,14 @@ def register_public_landing_callbacks(app):
             vendor_cluster_map[vendor] = sorted(vendor_df['Cluster'].unique())
         
         # Initialize state if needed
-        if n_intervals is None or not current_state:
+        if not current_state:
             # Initial state
             vendor = all_vendors[0] if all_vendors else "All"
             clusters = vendor_cluster_map.get(vendor, [])
             cluster = clusters[0] if clusters else "All"
             
             return (
-                {'vendor_index': 0, 'cluster_index': 0, 'combo_index': 0},
-                [vendor],
-                [cluster],
+                {'vendor_index': 0, 'cluster_index': 0, 'combo_index': 0, 'vendor': vendor, 'cluster': cluster},
                 vendor,
                 cluster
             )
@@ -130,20 +115,21 @@ def register_public_landing_callbacks(app):
         vendor = current_combo['vendor']
         cluster = current_combo['cluster']
         
-        # Update state
+        # Update state with vendor and cluster info included
         new_state = {
             'vendor_index': current_combo['vendor_index'],
             'cluster_index': current_combo['cluster_index'],
-            'combo_index': combo_index
+            'combo_index': combo_index,
+            'vendor': vendor,
+            'cluster': cluster
         }
         
         return (
             new_state,         # Updated rotation state
-            [vendor],          # Vendor filter value
-            [cluster],         # Cluster filter value
             vendor,            # Vendor display text
             cluster            # Cluster display text
         )
+    
     # Update public progress gauge
     @app.callback(
         Output('public-progress-gauge', 'figure'),
@@ -152,12 +138,6 @@ def register_public_landing_callbacks(app):
     def update_public_progress_gauge(pathname):
         """
         Update the progress gauge on the public landing page.
-        
-        Args:
-            pathname (str): Current URL path
-            
-        Returns:
-            plotly.graph_objects.Figure: Progress gauge figure
         """
         # Only proceed if we're on the landing page
         if pathname != '/':
@@ -177,48 +157,57 @@ def register_public_landing_callbacks(app):
         
         return fig
     
-    # Update all public charts based on current filters
-
-# Update all public charts based on current filters
+    # Update all public charts based on current vendor/cluster rotation state
     @app.callback(
         [Output('public-daily-progress-chart', 'figure'),
          Output('public-vendor-comparison-chart', 'figure'),
          Output('public-cluster-heatmap', 'figure')],
-        [Input('public-vendor-filter', 'data'),
-         Input('public-cluster-filter', 'data')]
+        [Input('rotation-state', 'data')]
     )
-    def update_public_charts(vendors, clusters):
+    def update_public_charts(rotation_state):
         """
-        Update all charts on the public landing page based on current filters.
+        Update all charts on the public landing page based on current rotation state.
+        """
+        if not rotation_state:
+            raise dash.exceptions.PreventUpdate
         
-        Args:
-            vendors (list): Selected vendors
-            clusters (list): Selected clusters
-            
-        Returns:
-            tuple: (daily_fig, vendor_fig, cluster_fig)
-        """
-        # Start with the full dataset
+        # Extract vendor and cluster from rotation state
+        vendor = rotation_state.get('vendor')
+        cluster = rotation_state.get('cluster')
+        
+        if not vendor or not cluster:
+            raise dash.exceptions.PreventUpdate
+        
+        # Filter data based on current vendor and cluster
         filtered_df = df.copy()
         
-        # Apply filters
-        if vendors and len(vendors) > 0:
-            filtered_df = filtered_df[filtered_df['Vendor'].isin(vendors)]
+        # Apply vendor filter
+        filtered_df = filtered_df[filtered_df['Vendor'] == vendor]
+        
+        # Apply cluster filter
+        filtered_df = filtered_df[filtered_df['Cluster'] == cluster]
+        
+        # Create charts based on filtered data
+        try:
+            # Daily progress chart
+            daily_fig = create_daily_progress_chart(filtered_df)
+        except Exception as e:
+            print(f"Error creating daily progress chart: {e}")
+            daily_fig = go.Figure().update_layout(title="Error creating chart")
             
-        if clusters and len(clusters) > 0:
-            filtered_df = filtered_df[filtered_df['Cluster'].isin(clusters)]
-        
-        # Get date columns for filtering
-        date_columns = [col for col in filtered_df.columns if col.startswith('Cumulative Quantity')]
-        
-        # Create daily progress chart
-        daily_fig = create_daily_progress_chart(filtered_df)
-        
-        # Create vendor comparison
-        vendor_fig = create_vendor_comparison(filtered_df)
-        
-        # Create cluster heatmap
-        cluster_fig = create_cluster_heatmap(filtered_df)
+        try:
+            # Vendor comparison chart
+            vendor_fig = create_vendor_comparison(filtered_df)
+        except Exception as e:
+            print(f"Error creating vendor comparison: {e}")
+            vendor_fig = go.Figure().update_layout(title="Error creating chart")
+            
+        try:
+            # Cluster heatmap
+            cluster_fig = create_cluster_heatmap(filtered_df)
+        except Exception as e:
+            print(f"Error creating cluster heatmap: {e}")
+            cluster_fig = go.Figure().update_layout(title="Error creating chart")
         
         # Enhance mobile responsiveness for all charts
         for fig in [daily_fig, vendor_fig, cluster_fig]:
@@ -244,17 +233,22 @@ def register_public_landing_callbacks(app):
         
         return daily_fig, vendor_fig, cluster_fig
     
-    # Helper function to create daily progress chart
+    # Update clock in real-time
+    @app.callback(
+        Output('tv-clock', 'children', allow_duplicate=True),
+        [Input('clock-interval', 'n_intervals')],
+        prevent_initial_call=True
+    )
+    def update_clock(n_intervals):
+        """
+        Update the clock display for TV mode in real-time.
+        """
+        from datetime import datetime
+        current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')
+        return current_time
+    
+    # Include the helper functions for creating charts
     def create_daily_progress_chart(dataframe):
-        """
-        Create a line chart showing daily progress.
-        
-        Args:
-            dataframe (pandas.DataFrame): The filtered data
-            
-        Returns:
-            plotly.graph_objects.Figure: Line chart figure
-        """
         try:
             # Get date columns
             date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
@@ -351,17 +345,7 @@ def register_public_landing_callbacks(app):
             fig.update_layout(title=f"Error creating chart")
             return fig
     
-    # Helper function to create vendor comparison
     def create_vendor_comparison(dataframe):
-        """
-        Create a bar chart comparing vendor performance.
-        
-        Args:
-            dataframe (pandas.DataFrame): The filtered data
-            
-        Returns:
-            plotly.graph_objects.Figure: Bar chart figure
-        """
         try:
             # Check if dataframe is empty
             if dataframe.empty:
@@ -438,17 +422,7 @@ def register_public_landing_callbacks(app):
             fig.update_layout(title=f"Error creating chart")
             return fig
     
-    # Helper function to create cluster heatmap
     def create_cluster_heatmap(dataframe):
-        """
-        Create a heatmap showing cluster progress.
-        
-        Args:
-            dataframe (pandas.DataFrame): The filtered data
-            
-        Returns:
-            plotly.graph_objects.Figure: Heatmap figure
-        """
         try:
             # Check if dataframe is empty
             if dataframe.empty:
@@ -527,142 +501,10 @@ def register_public_landing_callbacks(app):
             fig = go.Figure()
             fig.update_layout(title=f"Error creating heatmap")
             return fig
-    
-    # Helper function to create remediation map
-    def create_remediation_map(dataframe):
+    def update_clock(n_intervals):
         """
-        Create a map visualization of remediation status by ULB.
-        
-        Args:
-            dataframe (pandas.DataFrame): The filtered data
-            
-        Returns:
-            str: HTML string of the map
-        """
-        try:
-            # Check if dataframe is empty
-            if dataframe.empty:
-                return "<div style='text-align: center; padding: 20px;'><p>No data available for map visualization</p></div>"
-            
-            # Get latest date column
-            date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
-            
-            if not date_columns:
-                return "<div style='text-align: center; padding: 20px;'><p>No date data available for map visualization</p></div>"
-            
-            latest_date_col = date_columns[-1]
-            
-            # Create a base map centered on Andhra Pradesh
-            AP_CENTER = [16.2207, 80.1276]
-            m = folium.Map(location=AP_CENTER, zoom_start=7, tiles="CartoDB positron")
-            
-            # Create a marker cluster to group nearby markers
-            # Import MarkerCluster locally
-            from folium.plugins import MarkerCluster
-            marker_cluster = MarkerCluster().add_to(m)
-            
-            # Get ULB data
-            ulb_data = dataframe.groupby(['ULB', 'Cluster', 'Vendor']).agg({
-                'Quantity to be remediated in MT': 'sum',
-                latest_date_col: 'sum'
-            }).reset_index()
-            
-            # Initialize with zeros
-            ulb_data['Percent Complete'] = 0.0
-            
-            # Calculate percentage only where target > 0
-            mask = ulb_data['Quantity to be remediated in MT'] > 0
-            if mask.any():
-                ulb_data.loc[mask, 'Percent Complete'] = (
-                    ulb_data.loc[mask, latest_date_col] / 
-                    ulb_data.loc[mask, 'Quantity to be remediated in MT'] * 100
-                ).round(1)
-            
-            # Generate pseudo-random coordinates (for demonstration)
-            np.random.seed(42)  # For reproducibility
-            
-            # Generate coordinates around Andhra Pradesh
-            lat_offset = np.random.uniform(-1.5, 1.5, size=len(ulb_data))
-            lon_offset = np.random.uniform(-1.5, 1.5, size=len(ulb_data))
-            
-            ulb_data['lat'] = AP_CENTER[0] + lat_offset
-            ulb_data['lon'] = AP_CENTER[1] + lon_offset
-            
-            # Create markers for each ULB
-            for idx, row in ulb_data.iterrows():
-                ulb = row['ULB']
-                cluster = row['Cluster']
-                vendor = row['Vendor']
-                target = row['Quantity to be remediated in MT']
-                current = row[latest_date_col]
-                percent = row['Percent Complete']
-                
-                # Determine color based on completion percentage
-                if percent < 25:
-                    color = 'lightgray'
-                elif percent < 50:
-                    color = 'lightgreen'
-                elif percent < 75:
-                    color = 'green'
-                else:
-                    color = 'darkgreen'
-                
-                # Create popup content
-                popup_html = f"""
-                <div style="font-family: Arial; width: 200px;">
-                    <h4 style="color: #27ae60;">{ulb}</h4>
-                    <p><b>Cluster:</b> {cluster}</p>
-                    <p><b>Vendor:</b> {vendor}</p>
-                    <p><b>Target:</b> {target:,.0f} MT</p>
-                    <p><b>Remediated:</b> {current:,.0f} MT</p>
-                    <div style="background-color: #eee; height: 10px; width: 100%; border-radius: 5px;">
-                        <div style="background-color: #2ecc71; height: 10px; width: {min(percent, 100)}%; border-radius: 5px;"></div>
-                    </div>
-                    <p><b>Progress:</b> {percent:.1f}%</p>
-                </div>
-                """
-                # Add marker to the cluster
-                folium.Marker(
-                    location=[row['lat'], row['lon']],
-                    popup=folium.Popup(popup_html, max_width=300),
-                    icon=folium.Icon(color=color, icon='info-sign'),
-                    tooltip=f"{ulb} - {percent:.1f}%"
-                ).add_to(marker_cluster)
-            
-            # Add a legend
-            legend_html = '''
-            <div style="position: fixed; 
-                        bottom: 50px; right: 50px; 
-                        border: 2px solid grey; z-index: 9999; 
-                        background-color: white;
-                        padding: 10px;
-                        border-radius: 5px;
-                        font-family: Arial;">
-                <h4 style="margin-top: 0;">Completion Status</h4>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <div style="background-color: lightgray; width: 20px; height: 20px; margin-right: 10px;"></div>
-                    <div>0-25%</div>
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <div style="background-color: lightgreen; width: 20px; height: 20px; margin-right: 10px;"></div>
-                    <div>25-50%</div>
-                </div>
-                <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                    <div style="background-color: green; width: 20px; height: 20px; margin-right: 10px;"></div>
-                    <div>50-75%</div>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <div style="background-color: darkgreen; width: 20px; height: 20px; margin-right: 10px;"></div>
-                    <div>75-100%</div>
-                </div>
-            </div>
-            '''
-            
-            m.get_root().html.add_child(folium.Element(legend_html))
-            
-            # Return the HTML representation
-            return m._repr_html_()
-                
-        except Exception as e:
-            print(f"Error creating remediation map: {e}")
-            return f"<div style='text-align: center; padding: 20px;'><p>Error creating map: {str(e)}</p></div>"
+    Update the clock display for TV mode.
+    """
+    from datetime import datetime
+    current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')
+    return current_time

@@ -231,11 +231,8 @@ def create_summary_cards():
 
 def create_filters():
     """
-    Create filter controls with an additional Site filter,
-    compatible with dash-bootstrap-components 2.0.2.
-    
-    Returns:
-        dash component: Filters card
+    Create filter controls with improved initial state.
+    No pre-selected options on initial load.
     """
     vendors = sorted(df['Vendor'].unique())
     clusters = sorted(df['Cluster'].unique())
@@ -265,9 +262,10 @@ def create_filters():
                         id='vendor-filter',
                         options=[{'label': vendor, 'value': vendor} for vendor in vendors],
                         multi=True,
-                        placeholder="All Vendors"
+                        placeholder="Select Vendors",
+                        value=[]  # Start with empty selection
                     )
-                ], md=3, className="mb-3"),  # Adjusted width to md-3
+                ], md=3, className="mb-3"),
                 
                 # Cluster filter
                 dbc.Col([
@@ -276,20 +274,22 @@ def create_filters():
                         id='cluster-filter',
                         options=[{'label': cluster, 'value': cluster} for cluster in clusters],
                         multi=True,
-                        placeholder="All Clusters"
+                        placeholder="Select Clusters",
+                        value=[]  # Start with empty selection
                     )
-                ], md=3, className="mb-3"),  # Adjusted width to md-3
+                ], md=3, className="mb-3"),
                 
-                # Site filter (new)
+                # Site filter
                 dbc.Col([
                     html.Label("Site (ULB)", style=label_style),
                     dcc.Dropdown(
                         id='site-filter',
                         options=[{'label': site, 'value': site} for site in sites],
                         multi=True,
-                        placeholder="All Sites"
+                        placeholder="Select Sites",
+                        value=[]  # Start with empty selection
                     )
-                ], md=3, className="mb-3"),  # Width md-3
+                ], md=3, className="mb-3"),
                 
                 # Date Range filter
                 dbc.Col([
@@ -305,11 +305,11 @@ def create_filters():
                             )
                         ], style=date_picker_container_style, className="date-range-inputs")
                     ], className="date-range-wrapper")
-                ], md=3, className="mb-3")  # Adjusted width to md-3
-            ], className="g-3")  # Add gutter spacing between columns
+                ], md=3, className="mb-3")
+            ], className="g-3"),
             
-            # Optional: Add Reset Filters button
-            ,dbc.Row([
+            # Reset Filters button
+            dbc.Row([
                 dbc.Col([
                     dbc.Button(
                         "Reset Filters",
@@ -320,7 +320,7 @@ def create_filters():
                     )
                 ], width={"size": 2, "offset": 10})
             ])
-        ], className="p-3")  # Add padding inside card body
+        ], className="p-3")
     ], className="mb-4")
 
 def create_ulb_table(dataframe):

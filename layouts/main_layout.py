@@ -1,5 +1,5 @@
 """
-Updated layouts/main_layout.py with public landing page
+Updated layouts/main_layout.py with fixed public landing page components
 """
 
 from dash import html, dcc
@@ -29,19 +29,17 @@ def create_main_layout():
         # Add interval component for auto-rotation on landing page
         dcc.Interval(
             id='auto-rotation-interval',
-            interval=15 * 1000,  # 15 seconds in milliseconds
+            interval=60 * 1000,  # CHANGED: 60 seconds in milliseconds
             n_intervals=0,
             disabled=True  # Initially disabled, enabled only on landing page
         ),
         
-        # Store components for public landing page
-        dcc.Store(id='rotation-state', data={'vendor_index': 0, 'cluster_index': 0}),
-        dcc.Store(id='public-vendor-filter', data=[]),
-        dcc.Store(id='public-cluster-filter', data=[]),
+        # Store component for rotation state
+        dcc.Store(id='rotation-state', data={'vendor_index': 0, 'cluster_index': 0, 'combo_index': 0}),
         
         # Display components for public landing page
         html.Span(id='current-vendor-display', style={'display': 'none'}),
-        html.Span(id='current-cluster-display', style={'display': 'none'}),
+        html.Span(id='current-cluster-display', style={'display': 'none'})
     ])
 
 def create_public_landing_page():
@@ -227,22 +225,11 @@ def create_public_landing_page():
             hero_section,
             view_indicator,
             charts,
-            
-            # Store components
-            dcc.Store(id='public-vendor-filter', data=[vendors[0]] if vendors else []),
-            dcc.Store(id='public-cluster-filter', data=[clusters[0]] if clusters else []),
-            
-            # Progress gauge for callback
-            dcc.Graph(id='public-progress-gauge', style={'display': 'none'}),
-            # Chart placeholders
-            dcc.Graph(id='public-daily-progress-chart', style={'display': 'none'}),
-            dcc.Graph(id='public-vendor-comparison-chart', style={'display': 'none'}),
-            dcc.Graph(id='public-cluster-heatmap', style={'display': 'none'}),
-            
+                        
             # Add interval for clock updates
             dcc.Interval(
                 id='clock-interval',
-                interval=1000,  # 1 second
+                interval=1000,  # 60 second
                 n_intervals=0
             )
         ], className="py-2 px-2 px-sm-3", fluid=True),  # Use fluid container for full TV width

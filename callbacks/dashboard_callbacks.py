@@ -1,5 +1,5 @@
 """
-Fixed callbacks/dashboard_callbacks.py with proper imports
+Fixed callbacks/dashboard_callbacks.py with proper cross-filtering
 """
 
 from dash import Input, Output, State, callback_context, dash_table, html
@@ -30,8 +30,189 @@ def register_dashboard_callbacks(app):
     # Load data once
     df = load_data()
     
-    # The rest of your callback functions...
-    
+    # Define the callbacks here...
+    @app.callback(
+        [Output('cluster-filter', 'options'),
+         Output('cluster-filter', 'value'),
+         Output('site-filter', 'options'),
+         Output('site-filter', 'value')],
+        [Input('vendor-filter', 'value'),
+         Input('cluster-filter', 'value'),
+         Input('site-filter', 'value')]
+    )
+    def update_filter_options(selected_vendors, selected_clusters, selected_sites):
+        """
+        Update filter options based on selections, implementing cross-filtering
+        to show only relevant options based on current selections.
+        
+        When vendor is selected, only show clusters for that vendor.
+        When vendor and/or cluster are selected, only show sites for those selections.
+        """
+        # Access callback context INSIDE the callback function
+        ctx = callback_context
+        trigger_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
+        
+        # Load the full dataset
+        filtered_df = df.copy()
+        
+        # Step 1: Apply vendor filter if selected
+        if selected_vendors and len(selected_vendors) > 0:
+            filtered_df = filtered_df[filtered_df['Vendor'].isin(selected_vendors)]
+        
+        # Step 2: Get available clusters based on selected vendors
+        available_clusters = sorted(filtered_df['Cluster'].unique())
+        cluster_options = [{'label': cluster, 'value': cluster} for cluster in available_clusters]
+        
+        # Step 3: Further filter by selected clusters if they exist
+        if selected_clusters and len(selected_clusters) > 0:
+            # Check if selected clusters are still valid with the current vendor filter
+            valid_clusters = [c for c in selected_clusters if c in available_clusters]
+            
+            # Only apply filter if there are valid clusters left
+            if valid_clusters:
+                filtered_df = filtered_df[filtered_df['Cluster'].isin(valid_clusters)]
+                # Update selected clusters to only valid ones
+                selected_clusters = valid_clusters
+            else:
+                # If no valid clusters remain, clear the cluster selection
+                selected_clusters = []
+        
+        # Step 4: Get available sites based on filtered data (by vendor and possibly cluster)
+        available_sites = sorted(filtered_df['ULB'].unique())
+        site_options = [{'label': site, 'value': site} for site in available_sites]
+        
+        # Step 5: Check if current site selections are still valid
+        if selected_sites and len(selected_sites) > 0:
+            # Keep only valid sites based on current filters
+            valid_sites = [s for s in selected_sites if s in available_sites]
+            selected_sites = valid_sites if valid_sites else []
+        
+        # Return updated options and values
+        return cluster_options, selected_clusters, site_options, selected_sites
+
+    @app.callback(
+        [Output('vendor-filter', 'value', allow_duplicate=True),
+         Output('cluster-filter', 'value', allow_duplicate=True),
+         Output('site-filter', 'value', allow_duplicate=True),
+         Output('date-range-filter', 'start_date', allow_duplicate=True),
+         Output('date-range-filter', 'end_date', allow_duplicate=True)],
+        [Input('reset-filters-button', 'n_clicks')],
+        prevent_initial_call=True
+    )
+    def reset_filters(n_clicks):
+        """
+        Reset all filters to empty/default values when the reset button is clicked.
+        """
+        if n_clicks:
+            # Get the earliest and latest date from the date columns
+            date_columns = [col for col in df.columns if col.startswith('Cumulative Quantity')]
+            earliest_date = '2025-05-01'  # Default start date
+            
+            if date_columns:
+                latest_date_col = date_columns[-1]
+                latest_date = latest_date_col.split('(')[1].split(')')[0]
+            else:
+                latest_date = '2025-05-12'  # Fallback latest date
+            
+            # Return empty values for selection filters
+            return [], [], [], earliest_date, latest_date
+        
+        # This should not be reached due to prevent_initial_call=True
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+    @app.callback(
+        [Output('daily-progress-chart', 'figure'),
+         Output('vendor-comparison-chart', 'figure'),
+         Output('cluster-heatmap', 'figure'),
+         Output('remediation-map', 'srcDoc'),
+         Output('ulb-details-table', 'children')],
+        [Input('vendor-filter', 'value'),
+         Input('cluster-filter', 'value'),
+         Input('site-filter', 'value'),
+         Input('date-range-filter', 'start_date'),
+         Input('date-range-filter', 'end_date')]
+    )
+    def update_dashboard(vendors, clusters, sites, start_date, end_date):
+        """
+        Update all dashboard visualizations based on filter selections.
+        """
+        # Start with the full dataset
+        filtered_df = df.copy()
+        
+        # Apply filters
+        if vendors and len(vendors) > 0:
+            filtered_df = filtered_df[filtered_df['Vendor'].isin(vendors)]
+            
+        if clusters and len(clusters) > 0:
+            filtered_df = filtered_df[filtered_df['Cluster'].isin(clusters)]
+        
+        if sites and len(sites) > 0:
+            filtered_df = filtered_df[filtered_df['ULB'].isin(sites)]
+        
+        # Apply date range filter
+        date_columns = [col for col in filtered_df.columns if col.startswith('Cumulative Quantity')]
+        filtered_date_columns = []
+        
+        if date_columns:
+            for col in date_columns:
+                date_str = col.split('(')[1].split(')')[0]
+                if start_date <= date_str <= end_date:
+                    filtered_date_columns.append(col)
+        
+        # Make sure we have at least one date column
+        if not filtered_date_columns and date_columns:
+            filtered_date_columns = [date_columns[-1]]  # Use the latest date if no dates in range
+        
+        # Update all visualizations with filtered data
+        try:
+            # Create our own daily progress chart
+            daily_fig = create_daily_progress_chart(filtered_df, filtered_date_columns)
+        except Exception as e:
+            print(f"Error creating daily progress chart: {e}")
+            daily_fig = go.Figure().update_layout(title="Error creating daily progress chart")
+        
+        try:
+            # Create our own vendor comparison chart
+            vendor_fig = create_vendor_comparison(filtered_df)
+        except Exception as e:
+            print(f"Error creating vendor comparison: {e}")
+            vendor_fig = go.Figure().update_layout(title="Error creating vendor comparison")
+        
+        try:
+            # Create our own cluster heatmap
+            cluster_fig = create_cluster_heatmap(filtered_df)
+        except Exception as e:
+            print(f"Error creating cluster heatmap: {e}")
+            cluster_fig = go.Figure().update_layout(title="Error creating cluster heatmap")
+        
+        try:
+            # Use our local create_remediation_map function
+            map_html = create_remediation_map(filtered_df)
+        except Exception as e:
+            print(f"Error creating remediation map: {e}")
+            map_html = "<div>Error creating map</div>"
+        
+        # Create ULB table using our local function
+        try:
+            ulb_table = create_ulb_table(filtered_df)
+        except Exception as e:
+            print(f"Error creating ULB table: {e}")
+            ulb_table = html.Div("Error creating ULB table")
+        
+        return daily_fig, vendor_fig, cluster_fig, map_html, ulb_table
+
+    @app.callback(
+        Output('tv-clock', 'children'),
+        [Input('clock-interval', 'n_intervals')]
+    )
+    def update_clock(n_intervals):
+        """
+        Update the clock display for TV mode.
+        """
+        from datetime import datetime
+        current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')
+        return current_time
+
     # Function to create a remediation map
     def create_remediation_map(dataframe):
         """
@@ -166,6 +347,7 @@ def register_dashboard_callbacks(app):
         except Exception as e:
             print(f"Error in create_remediation_map: {e}")
             return f"<div style='text-align: center; padding: 20px;'><p>Error creating map: {str(e)}</p></div>"
+
     # Function to create ULB table
     def create_ulb_table(dataframe):
         """
@@ -237,210 +419,6 @@ def register_dashboard_callbacks(app):
             print(f"Error in create_ulb_table: {e}")
             return html.Div(f"Error creating table: {str(e)}", style={'padding': '20px', 'textAlign': 'center'})
 
-
-    @app.callback(
-        Output('tv-clock', 'children'),
-        [Input('clock-interval', 'n_intervals')]
-    )
-    def update_clock(n_intervals):
-        """
-        Update the clock display for TV mode.
-        """
-        from datetime import datetime
-        current_time = datetime.now().strftime('%B %d, %Y %I:%M:%S %p')
-        return current_time
-
-
-    # Define the callbacks here...
-    @app.callback(
-        [Output('cluster-filter', 'options'),
-         Output('cluster-filter', 'value'),
-         Output('site-filter', 'options'),
-         Output('site-filter', 'value')],
-        [Input('vendor-filter', 'value'),
-         Input('cluster-filter', 'value'),
-         Input('site-filter', 'value')]
-    )
-    def update_filter_options(selected_vendors, selected_clusters, selected_sites):
-        """
-        Update filter options based on selections, implementing cross-filtering
-        to show only relevant options based on current selections.
-        """
-        ctx = callback_context
-        trigger_id = ctx.triggered[0]['prop_id'].split('.')[0] if ctx.triggered else None
-        
-        # Load the full dataset
-        filtered_df = df.copy()
-        
-        # Apply vendor filter if selected
-        if selected_vendors and len(selected_vendors) > 0:
-            filtered_df = filtered_df[filtered_df['Vendor'].isin(selected_vendors)]
-        
-        # Apply cluster filter if selected and not the trigger
-        if selected_clusters and len(selected_clusters) > 0 and trigger_id != 'cluster-filter':
-            filtered_df = filtered_df[filtered_df['Cluster'].isin(selected_clusters)]
-        
-        # Apply site filter if selected and not the trigger
-        if selected_sites and len(selected_sites) > 0 and trigger_id != 'site-filter':
-            filtered_df = filtered_df[filtered_df['ULB'].isin(selected_sites)]
-        
-        # Get available clusters based on current filters
-        available_clusters = sorted(filtered_df['Cluster'].unique())
-        cluster_options = [{'label': cluster, 'value': cluster} for cluster in available_clusters]
-        
-        # Get available sites based on current filters
-        available_sites = sorted(filtered_df['ULB'].unique())
-        site_options = [{'label': site, 'value': site} for site in available_sites]
-        
-        # Adjust selected values if they're no longer in the options
-        if trigger_id == 'vendor-filter':
-            # If vendor changed, reset clusters to those available for the vendor
-            filtered_cluster_options = [c['value'] for c in cluster_options]
-            if selected_clusters:
-                cluster_value = [c for c in selected_clusters if c in filtered_cluster_options]
-            else:
-                cluster_value = filtered_cluster_options if len(filtered_cluster_options) <= 3 else filtered_cluster_options[:3]
-                
-            # Also reset site values based on new vendor+cluster combination
-            filtered_site_options = [s['value'] for s in site_options]
-            site_value = filtered_site_options if len(filtered_site_options) <= 5 else filtered_site_options[:5]
-        elif trigger_id == 'cluster-filter':
-            # Keep selected clusters if possible
-            cluster_value = selected_clusters
-            
-            # Update sites based on selected clusters
-            filtered_site_options = [s['value'] for s in site_options]
-            if selected_sites:
-                site_value = [s for s in selected_sites if s in filtered_site_options]
-            else:
-                site_value = filtered_site_options if len(filtered_site_options) <= 5 else filtered_site_options[:5]
-        else:
-            # For other triggers, try to keep selections if valid
-            filtered_cluster_options = [c['value'] for c in cluster_options]
-            if selected_clusters:
-                cluster_value = [c for c in selected_clusters if c in filtered_cluster_options]
-            else:
-                cluster_value = selected_clusters
-                
-            filtered_site_options = [s['value'] for s in site_options]
-            if selected_sites:
-                site_value = [s for s in selected_sites if s in filtered_site_options]
-            else:
-                site_value = selected_sites
-        
-        return cluster_options, cluster_value, site_options, site_value
-
-    @app.callback(
-        [Output('daily-progress-chart', 'figure'),
-         Output('vendor-comparison-chart', 'figure'),
-         Output('cluster-heatmap', 'figure'),
-         Output('remediation-map', 'srcDoc'),
-         Output('ulb-details-table', 'children')],
-        [Input('vendor-filter', 'value'),
-         Input('cluster-filter', 'value'),
-         Input('site-filter', 'value'),
-         Input('date-range-filter', 'start_date'),
-         Input('date-range-filter', 'end_date')]
-    )
-    def update_dashboard(vendors, clusters, sites, start_date, end_date):
-        """
-        Update all dashboard visualizations based on filter selections.
-        """
-        # Start with the full dataset
-        filtered_df = df.copy()
-        
-        # Apply filters
-        if vendors and len(vendors) > 0:
-            filtered_df = filtered_df[filtered_df['Vendor'].isin(vendors)]
-            
-        if clusters and len(clusters) > 0:
-            filtered_df = filtered_df[filtered_df['Cluster'].isin(clusters)]
-        
-        if sites and len(sites) > 0:
-            filtered_df = filtered_df[filtered_df['ULB'].isin(sites)]
-        
-        # Apply date range filter
-        date_columns = [col for col in filtered_df.columns if col.startswith('Cumulative Quantity')]
-        filtered_date_columns = []
-        
-        if date_columns:
-            for col in date_columns:
-                date_str = col.split('(')[1].split(')')[0]
-                if start_date <= date_str <= end_date:
-                    filtered_date_columns.append(col)
-        
-        # Make sure we have at least one date column
-        if not filtered_date_columns and date_columns:
-            filtered_date_columns = [date_columns[-1]]  # Use the latest date if no dates in range
-        
-        # Update all visualizations with filtered data
-        try:
-            # Create our own daily progress chart
-            daily_fig = create_daily_progress_chart(filtered_df, filtered_date_columns)
-        except Exception as e:
-            print(f"Error creating daily progress chart: {e}")
-            daily_fig = go.Figure().update_layout(title="Error creating daily progress chart")
-        
-        try:
-            # Create our own vendor comparison chart
-            vendor_fig = create_vendor_comparison(filtered_df)
-        except Exception as e:
-            print(f"Error creating vendor comparison: {e}")
-            vendor_fig = go.Figure().update_layout(title="Error creating vendor comparison")
-        
-        try:
-            # Create our own cluster heatmap
-            cluster_fig = create_cluster_heatmap(filtered_df)
-        except Exception as e:
-            print(f"Error creating cluster heatmap: {e}")
-            cluster_fig = go.Figure().update_layout(title="Error creating cluster heatmap")
-        
-        try:
-            # Use our local create_remediation_map function
-            map_html = create_remediation_map(filtered_df)
-        except Exception as e:
-            print(f"Error creating remediation map: {e}")
-            map_html = "<div>Error creating map</div>"
-        
-        # Create ULB table using our local function
-        try:
-            ulb_table = create_ulb_table(filtered_df)
-        except Exception as e:
-            print(f"Error creating ULB table: {e}")
-            ulb_table = html.Div("Error creating ULB table")
-        
-        return daily_fig, vendor_fig, cluster_fig, map_html, ulb_table
-
-    @app.callback(
-        [Output('vendor-filter', 'value', allow_duplicate=True),
-         Output('cluster-filter', 'value', allow_duplicate=True),
-         Output('site-filter', 'value', allow_duplicate=True),
-         Output('date-range-filter', 'start_date', allow_duplicate=True),
-         Output('date-range-filter', 'end_date', allow_duplicate=True)],
-        [Input('reset-filters-button', 'n_clicks')],
-        prevent_initial_call=True
-    )
-    def reset_filters(n_clicks):
-        """
-        Reset all filters to their default values.
-        """
-        if n_clicks:
-            # Get the earliest and latest date from the date columns
-            date_columns = [col for col in df.columns if col.startswith('Cumulative Quantity')]
-            earliest_date = '2025-05-01'  # Default start date
-            
-            if date_columns:
-                latest_date_col = date_columns[-1]
-                latest_date = latest_date_col.split('(')[1].split(')')[0]
-            else:
-                latest_date = '2025-05-12'  # Fallback latest date
-            
-            # Return default values
-            return None, None, None, earliest_date, latest_date
-        
-        # This should not be reached due to prevent_initial_call=True
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    
     # Helper function to create daily progress chart
     def create_daily_progress_chart(dataframe, filtered_date_columns=None):
         """
