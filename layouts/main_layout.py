@@ -33,10 +33,27 @@ def create_main_layout():
             disabled=True  # Initially disabled, enabled only on landing page
         ),
         
-        # Store for current rotation state
-        dcc.Store(id='rotation-state', data={'vendor_index': 0, 'cluster_index': 0})
+        # Store components
+        dcc.Store(id='rotation-state', data={'vendor_index': 0, 'cluster_index': 0}),
+        dcc.Store(id='public-vendor-filter', data=[]),
+        dcc.Store(id='public-cluster-filter', data=[]),
+        
+        # Hidden components for public landing page
+        html.Div([
+            # Display components
+            html.Span(id='current-vendor-display', children=''),
+            html.Span(id='current-cluster-display', children=''),
+            
+            # Chart placeholders - Make sure to use the correct component types
+            dcc.Graph(id='public-progress-gauge', figure={}),
+            dcc.Graph(id='public-daily-progress-chart', figure={}),
+            dcc.Graph(id='public-vendor-comparison-chart', figure={}),
+            dcc.Graph(id='public-cluster-heatmap', figure={}),
+            
+            # Important: Use html.Iframe for srcDoc property
+            html.Iframe(id='public-remediation-map', srcDoc='')
+        ], style={'display': 'none'})
     ])
-
 def create_public_landing_page():
     """
     Create the public landing page with auto-rotating dashboard.
@@ -57,7 +74,7 @@ def create_public_landing_page():
         dbc.Container([
             html.A(
                 dbc.Row([
-                    dbc.Col(html.I(className="fas fa-leaf", style={"fontSize": "24px"}), width="auto"),
+                    #dbc.Col(html.I(className="fas fa-leaf", style={"fontSize": "24px"}), width="auto"),
                     dbc.Col(dbc.NavbarBrand("Swaccha Andhra", style={"color": "white", "fontWeight": "bold"}), width="auto")
                 ], align="center", className="g-0"),
                 href="/",
@@ -230,30 +247,19 @@ def create_public_landing_page():
 def display_page(pathname, is_authenticated):
     """
     Display the appropriate page based on URL and authentication state.
-    
-    Args:
-        pathname (str): The current URL path
-        is_authenticated (bool): Whether the user is authenticated
-        
-    Returns:
-        dash component: The page content to display
     """
-    if pathname == '/login':
-        # Always show login page when specifically navigating to /login
+    # Make sure this condition is working correctly
+    if pathname == '/':
+        if not is_authenticated:
+            return create_public_landing_page()  # This should show the public dashboard
+        else:
+            return create_dashboard_layout()
+    elif pathname == '/login':
         return create_login_layout()
     elif pathname == '/dashboard':
-        # Protected dashboard route
         if is_authenticated:
             return create_dashboard_layout()
         return create_login_layout()
-    elif pathname == '/':
-        # Public landing page (default route)
-        if is_authenticated:
-            # Logged in users see the full dashboard
-            return create_dashboard_layout()
-        else:
-            # Anonymous users see the public landing page
-            return create_public_landing_page()
     else:
         # 404 page
         return html.Div([

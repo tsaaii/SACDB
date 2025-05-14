@@ -1,5 +1,5 @@
 """
-Updated app.py with public landing page
+Updated app.py with data file monitoring
 """
 
 import dash
@@ -7,6 +7,9 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import flask
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+import os
+import time
+import threading
 
 # Create a Flask server
 server = flask.Flask(__name__)
@@ -25,6 +28,47 @@ from layouts.main_layout import create_main_layout
 from callbacks.auth_callbacks import register_auth_callbacks
 from callbacks.dashboard_callbacks import register_dashboard_callbacks
 from callbacks.public_landing_callbacks import register_public_landing_callbacks
+from data_processing import load_data
+
+# Global variable to track when data file was last modified
+DATA_FILE_LAST_MODIFIED = 0
+
+# Function to watch for changes in the data file
+def watch_data_file():
+    global DATA_FILE_LAST_MODIFIED
+    
+    # Initialize with current modification time
+    try:
+        DATA_FILE_LAST_MODIFIED = os.path.getmtime('data.csv')
+        print(f"Initial data file timestamp: {time.ctime(DATA_FILE_LAST_MODIFIED)}")
+    except Exception as e:
+        print(f"Error getting initial file timestamp: {e}")
+    
+    # Start watching for changes
+    while True:
+        try:
+            current_modified = os.path.getmtime('data.csv')
+            if current_modified > DATA_FILE_LAST_MODIFIED:
+                print(f"Data file changed at {time.ctime(current_modified)}")
+                DATA_FILE_LAST_MODIFIED = current_modified
+                
+                # Clear any cached data to force a reload
+                # This assumes your load_data function has caching
+                load_data(force_reload=True)
+                
+        except Exception as e:
+            print(f"Error checking data file: {e}")
+        
+        # Sleep for a few seconds before checking again
+        time.sleep(5)  # Check every 5 seconds
+
+# Start the file watcher thread
+@server.before_first_request
+def start_file_watcher():
+    watcher_thread = threading.Thread(target=watch_data_file)
+    watcher_thread.daemon = True  # This ensures the thread will close when the main app closes
+    watcher_thread.start()
+    print("Data file watcher thread started")
 
 @login_manager.user_loader
 def load_user_callback(user_id):
@@ -75,5 +119,17 @@ register_auth_callbacks(app)
 register_dashboard_callbacks(app)
 register_public_landing_callbacks(app)  # Add the public landing page callbacks
 
+# Add endpoint to get last modified time
+@server.route('/api/data-modified-time')
+def get_data_modified_time():
+    global DATA_FILE_LAST_MODIFIED
+    return {'timestamp': DATA_FILE_LAST_MODIFIED, 'formatted': time.ctime(DATA_FILE_LAST_MODIFIED)}
+
 if __name__ == '__main__':
+    # Start the file watcher here for development mode
+    watcher_thread = threading.Thread(target=watch_data_file)
+    watcher_thread.daemon = True
+    watcher_thread.start()
+    print("Data file watcher thread started (development mode)")
+    
     app.run(debug=True, port=8050)

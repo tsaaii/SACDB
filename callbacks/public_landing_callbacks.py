@@ -59,24 +59,31 @@ def register_public_landing_callbacks(app):
     # Update rotation state
     @app.callback(
         [Output('rotation-state', 'data'),
-         Output('public-vendor-filter', 'data'),
-         Output('public-cluster-filter', 'data'),
-         Output('current-vendor-display', 'children'),
-         Output('current-cluster-display', 'children')],
-        [Input('auto-rotation-interval', 'n_intervals')],
+        Output('public-vendor-filter', 'data'),
+        Output('public-cluster-filter', 'data'),
+        Output('current-vendor-display', 'children'),
+        Output('current-cluster-display', 'children')],
+        [Input('auto-rotation-interval', 'n_intervals'),
+        Input('url', 'pathname')],  # Added this input
         [State('rotation-state', 'data')]
     )
-    def update_rotation_state(n_intervals, current_state):
+    def update_rotation_state(n_intervals, pathname, current_state):  # Update the function parameters
         """
         Update rotation state to cycle through vendors and clusters.
         
         Args:
             n_intervals (int): Number of interval triggers
+            pathname (str): Current URL path
             current_state (dict): Current rotation state
-            
+                
         Returns:
             tuple: (rotation_state, vendor_filter, cluster_filter, vendor_display, cluster_display)
         """
+        # Skip updates if not on the landing page
+        if pathname != '/':
+            raise dash.exceptions.PreventUpdate
+            
+        # Rest of your function's code remains the same
         if n_intervals is None or not all_vendors or not all_clusters:
             # Initial state or no data
             return (

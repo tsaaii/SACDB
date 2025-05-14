@@ -25,6 +25,7 @@ def register_auth_callbacks(app):
         """
         Route to the appropriate page based on URL and authentication state.
         """
+        is_authenticated = current_user.is_authenticated
         return display_page(pathname, current_user.is_authenticated)
     
     # Login callback
