@@ -1,5 +1,7 @@
 """
-Fixed version of app.py that eliminates duplicate callback issues
+app.py - Fixed version with proper callback registration
+
+This version ensures all callbacks are registered correctly with no duplicate registration.
 """
 
 import dash
@@ -29,7 +31,8 @@ from auth import load_user, User, users
 from layouts.main_layout import create_main_layout
 from callbacks.auth_callbacks import register_auth_callbacks
 from callbacks.dashboard_callbacks import register_dashboard_callbacks
-from callbacks.public_landing_callbacks import register_public_landing_callbacks
+# Remove this import since we're using enhanced_public_callbacks directly
+# from callbacks.public_landing_callbacks import register_public_landing_callbacks
 from data_processing import load_data
 
 # Global variable to track when data file was last modified
@@ -135,11 +138,11 @@ app.index_string = '''
 # Set up the app layout
 app.layout = create_main_layout()
 
-# Register callbacks
+# Register callbacks - IMPORTANT: only register each callback group once!
 register_auth_callbacks(app)
 register_dashboard_callbacks(app)
-register_public_landing_callbacks(app)  
-register_enhanced_public_callbacks(app)
+# Only use enhanced version, not both
+register_enhanced_public_callbacks(app)  
 
 # Add endpoint to get last modified time
 @server.route('/api/data-modified-time')
@@ -154,4 +157,5 @@ if __name__ == '__main__':
     watcher_thread.start()
     print("Data file watcher thread started (development mode)")
     
-    app.run(debug=True, port=8050)
+    # Enable dev tools for better debugging
+    app.run(debug=True, port=8050, dev_tools_ui=True, dev_tools_props_check=True)

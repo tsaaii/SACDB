@@ -1,8 +1,7 @@
 """
-callbacks/enhanced_public_callbacks.py - Improved callbacks for rotation
+callbacks/enhanced_public_callbacks.py - Enhanced callbacks for public landing page
 
-This file registers callbacks for the enhanced public landing page with updated functionality
-for efficient auto-rotation between overview and vendor-specific views.
+This file registers callbacks for the enhanced public landing page with optimized behavior.
 """
 
 from dash import Input, Output, State, callback_context, html, dcc
