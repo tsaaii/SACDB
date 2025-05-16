@@ -1,14 +1,16 @@
 """
-Fixed callbacks/dashboard_callbacks.py with unique clock ID
+callbacks/dashboard_callbacks.py - Fixed version with corrected syntax for ULB table
+
+This file fixes the syntax error in the ULB table column definition.
 """
 
-from dash import Input, Output, State, callback_context, dash_table, html
+from dash import Input, Output, State, callback_context, dash_table, html, dcc
 import dash
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import folium
-from folium.plugins import MarkerCluster  # Corrected import for MarkerCluster
+from folium.plugins import MarkerCluster
 import numpy as np
 
 # Define theme colors
@@ -17,8 +19,9 @@ DARK_GREEN = "#27ae60"
 LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
 
-# Make sure to import the necessary functions from data_processing
+# Import necessary functions
 from data_processing import load_data, get_dashboard_metrics
+from visualizations.charts import create_progress_gauge
 
 def register_dashboard_callbacks(app):
     """
@@ -119,6 +122,93 @@ def register_dashboard_callbacks(app):
         
         # This should not be reached due to prevent_initial_call=True
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+    # NEW CALLBACK - Update Summary Cards based on filters
+    @app.callback(
+        [Output('total-target-card', 'children'),
+         Output('total-remediated-card', 'children'),
+         Output('progress-gauge-card', 'children'),
+         Output('filtered-metrics-title', 'children')],
+        [Input('vendor-filter', 'value'),
+         Input('cluster-filter', 'value'),
+         Input('site-filter', 'value'),
+         Input('date-range-filter', 'start_date'),
+         Input('date-range-filter', 'end_date')]
+    )
+    def update_summary_cards(vendors, clusters, sites, start_date, end_date):
+        """
+        Update summary metrics cards based on the current filter selections.
+        """
+        # Start with the full dataset
+        filtered_df = df.copy()
+        title_prefix = "Overall"
+        
+        # Apply filters
+        if vendors and len(vendors) > 0:
+            filtered_df = filtered_df[filtered_df['Vendor'].isin(vendors)]
+            title_prefix = f"{'Vendor' if len(vendors) == 1 else 'Vendors'}"
+            if len(vendors) == 1:
+                title_prefix = f"Vendor: {vendors[0]}"
+            
+        if clusters and len(clusters) > 0:
+            filtered_df = filtered_df[filtered_df['Cluster'].isin(clusters)]
+            title_prefix = f"{'Cluster' if len(clusters) == 1 else 'Clusters'}"
+            if len(clusters) == 1:
+                title_prefix = f"Cluster: {clusters[0]}"
+            
+        if sites and len(sites) > 0:
+            filtered_df = filtered_df[filtered_df['ULB'].isin(sites)]
+            title_prefix = f"{'ULB' if len(sites) == 1 else 'ULBs'}"
+            if len(sites) == 1:
+                title_prefix = f"ULB: {sites[0]}"
+        
+        # Get metrics for the filtered data
+        metrics = get_dashboard_metrics(filtered_df)
+        
+        # Date for display
+        latest_date = metrics['latest_date']
+        
+        # Create the three cards with updated content
+        total_target_card = html.Div([
+            html.H5("Total Waste Target", className="card-title mb-3"),
+            html.H2(f"{metrics['total_to_remediate']:,.0f} MT", className="text-primary mb-3"),
+            html.P("Total waste to be remediated", className="card-text text-muted mb-0")
+        ])
+        
+        total_remediated_card = html.Div([
+            html.H5("Remediated So Far", className="card-title mb-3"),
+            html.H2(f"{metrics['total_remediated']:,.0f} MT", className="text-success mb-3"),
+            html.P(f"As of {metrics['latest_date']}", className="card-text text-muted mb-0")
+        ])
+        
+        # Create an improved progress gauge card
+        progress_gauge_card = html.Div([
+            html.H5("Overall Progress", className="card-title mb-2"),
+            html.Div([
+                # Wrap the gauge in a container div for better centering
+                dcc.Graph(
+                    figure=create_progress_gauge(metrics['percent_complete']),
+                    config={'displayModeBar': False},
+                    className="centered-gauge",
+                    style={
+                        'height': '140px',  # Increased height for better visibility
+                        'margin': '0 auto',
+                        'display': 'block'
+                    }
+                )
+            ], className="d-flex justify-content-center align-items-center gauge-container"),
+            html.P(f"{metrics['percent_complete']:.1f}% Complete", 
+                  className="card-text text-center mt-2 mb-0", 
+                  style={"fontSize": "1.2rem", "fontWeight": "500", "color": DARK_GREEN})
+        ])
+        
+        # Update the title based on filters
+        if any([vendors, clusters, sites]):
+            filtered_title = html.H1(f"{title_prefix} Dashboard", className="my-4", style={"color": DARK_GREEN})
+        else:
+            filtered_title = html.H1("Swaccha Andhra Dashboard", className="my-4", style={"color": DARK_GREEN})
+        
+        return total_target_card, total_remediated_card, progress_gauge_card, filtered_title
 
     @app.callback(
         [Output('daily-progress-chart', 'figure'),
@@ -237,8 +327,6 @@ def register_dashboard_callbacks(app):
             m = folium.Map(location=AP_CENTER, zoom_start=7, tiles="CartoDB positron")
             
             # Create a marker cluster to group nearby markers
-            # Use MarkerCluster from folium.plugins correctly
-            from folium.plugins import MarkerCluster
             marker_cluster = MarkerCluster().add_to(m)
             
             # Get ULB data
@@ -259,7 +347,6 @@ def register_dashboard_callbacks(app):
                 ).round(1)
             
             # Generate pseudo-random coordinates (for demonstration)
-            import numpy as np
             np.random.seed(42)  # For reproducibility
             
             # Generate coordinates around Andhra Pradesh
@@ -389,7 +476,7 @@ def register_dashboard_callbacks(app):
                     {"name": "Vendor", "id": "Vendor"},
                     {"name": "Target (MT)", "id": "Quantity to be remediated in MT", "type": "numeric", "format": {"specifier": ",.0f"}},
                     {"name": "April (MT)", "id": "Quantity remediated upto 30th April 2025 in MT", "type": "numeric", "format": {"specifier": ",.0f"}},
-                    {"name": f"Current (MT)", "id": latest_date_col, "type": "numeric", "format": {"specifier": ",.0f"}},
+                    {"name": "Current (MT)", "id": latest_date_col, "type": "numeric", "format": {"specifier": ",.0f"}},
                     {"name": "Completion %", "id": "Percent Complete", "type": "numeric", "format": {"specifier": ".1f"}}
                 ],
                 data=ulb_data.to_dict('records'),
@@ -419,268 +506,6 @@ def register_dashboard_callbacks(app):
         except Exception as e:
             print(f"Error in create_ulb_table: {e}")
             return html.Div(f"Error creating table: {str(e)}", style={'padding': '20px', 'textAlign': 'center'})
-
-    # Helper function to create daily progress chart
-    def create_daily_progress_chart(dataframe, filtered_date_columns=None):
-        """
-        Create a line chart showing daily progress.
-        """
-        # Get all date columns if not specified
-        if filtered_date_columns is None or len(filtered_date_columns) == 0:
-            date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
-        else:
-            date_columns = filtered_date_columns
-        
-        # Check if we have any date columns
-        if not date_columns:
-            # Return empty figure with message if no date columns
-            fig = go.Figure()
-            fig.update_layout(
-                title="No date data available",
-                xaxis_title='Date',
-                yaxis_title='Total Remediated (MT)',
-                height=300
-            )
-            return fig
-        
-        # Prepare data for the chart
-        daily_totals = []
-        for col in date_columns:
-            # Extract date from column name
-            try:
-                date_str = col.split('(')[1].split(')')[0]
-                total = dataframe[col].sum()
-                daily_totals.append({'Date': date_str, 'Total Remediated (MT)': total})
-            except (IndexError, KeyError) as e:
-                print(f"Error processing column {col}: {e}")
-                continue
-        
-        # If we have no data points, return empty figure
-        if len(daily_totals) == 0:
-            fig = go.Figure()
-            fig.update_layout(
-                title="No valid data for the selected filters",
-                xaxis_title='Date',
-                yaxis_title='Total Remediated (MT)',
-                height=300
-            )
-            return fig
-        
-        # Create DataFrame for plotting
-        daily_data = pd.DataFrame(daily_totals)
-        
-        # Sort by date
-        daily_data['Date'] = pd.to_datetime(daily_data['Date'])
-        daily_data = daily_data.sort_values('Date')
-        
-        # Convert back to string for display
-        daily_data['Date'] = daily_data['Date'].dt.strftime('%Y-%m-%d')
-        
-        # Create line chart
-        fig = px.line(
-            daily_data, 
-            x='Date', 
-            y='Total Remediated (MT)',
-            markers=True,
-            line_shape='linear'  # Changed from 'spline' for better handling of edge cases
-        )
-        
-        # Customize the figure
-        fig.update_traces(
-            mode='lines+markers',
-            line=dict(color=DARK_GREEN, width=3),
-            marker=dict(size=8, color=EMERALD)
-        )
-        
-        fig.update_layout(
-            xaxis_title='Date',
-            yaxis_title='Total Remediated (MT)',
-            margin=dict(l=40, r=40, t=40, b=40),
-            plot_bgcolor='white',
-            hovermode='x unified',
-            height=300
-        )
-        
-        # Add light grid lines
-        fig.update_xaxes(
-            showgrid=True,
-            gridwidth=1,
-            gridcolor='lightgray',
-            tickangle=45  # Angle tick labels for better readability
-        )
-        fig.update_yaxes(
-            showgrid=True,
-            gridwidth=1,
-            gridcolor='lightgray'
-        )
-        
-        return fig
-    
-    # Helper function to create vendor comparison chart
-    def create_vendor_comparison(dataframe):
-        """
-        Create a bar chart comparing vendor performance.
-        """
-        # Check if dataframe is empty
-        if dataframe.empty:
-            fig = go.Figure()
-            fig.update_layout(
-                title="No data available for vendor comparison",
-                height=300
-            )
-            return fig
-        
-        # Get latest date column
-        date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
-        
-        if not date_columns:
-            fig = go.Figure()
-            fig.update_layout(
-                title="No date data available for vendor comparison",
-                height=300
-            )
-            return fig
-        
-        latest_date_col = date_columns[-1]
-        
-        # Group by vendor
-        try:
-            vendor_stats = dataframe.groupby('Vendor').agg({
-                'Quantity to be remediated in MT': 'sum',
-                latest_date_col: 'sum'
-            }).reset_index()
-            
-            # Check if we have any data
-            if vendor_stats.empty or len(vendor_stats) == 0:
-                fig = go.Figure()
-                fig.update_layout(
-                    title="No vendor data available for the selected filters",
-                    height=300
-                )
-                return fig
-            
-            # Create the figure
-            fig = go.Figure()
-            
-            fig.add_trace(go.Bar(
-                x=vendor_stats['Vendor'],
-                y=vendor_stats['Quantity to be remediated in MT'],
-                name='Target',
-                marker_color='#8B4513'  # SaddleBrown color
-            ))
-            
-            fig.add_trace(go.Bar(
-                x=vendor_stats['Vendor'],
-                y=vendor_stats[latest_date_col],
-                name='Completed',
-                marker_color='#2E8B57'  # SeaGreen color
-            ))
-            
-            fig.update_layout(
-                title="Vendor Performance Comparison",
-                xaxis_title='Vendor',
-                yaxis_title='Quantity (MT)',
-                barmode='group',
-                margin=dict(l=40, r=40, t=60, b=40),
-                plot_bgcolor='white',
-                hovermode='x unified',
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                height=300
-            )
-            
-            return fig
-            
-        except Exception as e:
-            print(f"Error in create_vendor_comparison: {e}")
-            fig = go.Figure()
-            fig.update_layout(
-                title=f"Error creating vendor comparison: {str(e)}",
-                height=300
-            )
-            return fig
-    
-    # Helper function to create cluster heatmap
-    def create_cluster_heatmap(dataframe):
-        """
-        Create a heatmap showing cluster progress.
-        """
-        # Check if dataframe is empty
-        if dataframe.empty:
-            fig = go.Figure()
-            fig.update_layout(
-                title="No data available for cluster heatmap",
-                height=300
-            )
-            return fig
-        
-        try:
-            # Get latest date column
-            date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
-            
-            if not date_columns:
-                fig = go.Figure()
-                fig.update_layout(
-                    title="No date data available for cluster heatmap",
-                    height=300
-                )
-                return fig
-            
-            latest_date_col = date_columns[-1]
-            
-            # Calculate percent completion by cluster
-            cluster_data = dataframe.groupby('Cluster').agg({
-                'Quantity to be remediated in MT': 'sum',
-                latest_date_col: 'sum'
-            }).reset_index()
-            
-            # Check if we have any data
-            if cluster_data.empty or len(cluster_data) == 0:
-                fig = go.Figure()
-                fig.update_layout(
-                    title="No cluster data available for the selected filters",
-                    height=300
-                )
-                return fig
-            
-            # Initialize percent complete with zeros
-            cluster_data['Percent Complete'] = 0.0
-            
-            # Calculate percentages only for rows with non-zero targets
-            mask = cluster_data['Quantity to be remediated in MT'] > 0
-            if mask.any():
-                cluster_data.loc[mask, 'Percent Complete'] = (
-                    cluster_data.loc[mask, latest_date_col] / 
-                    cluster_data.loc[mask, 'Quantity to be remediated in MT'] * 100
-                ).round(1)
-            
-            # Sort by percentage
-            cluster_data = cluster_data.sort_values('Percent Complete', ascending=False)
-            
-            # Create heatmap
-            fig = px.imshow(
-                [cluster_data['Percent Complete']],
-                x=cluster_data['Cluster'],
-                labels=dict(x="Cluster", y="", color="Completion %"),
-                color_continuous_scale=[[0, 'lightgray'], [0.5, LIGHT_GREEN], [1, DARK_GREEN]],
-                text_auto='.1f'
-            )
-            
-            fig.update_layout(
-                title="Cluster Completion Rate (%)",
-                margin=dict(l=40, r=40, t=60, b=100),
-                plot_bgcolor='white',
-                coloraxis_showscale=True,
-                xaxis=dict(tickangle=45),
-                height=300
-            )
-            
-            return fig
-            
-        except Exception as e:
-            print(f"Error in create_cluster_heatmap: {e}")
-            fig = go.Figure()
-            fig.update_layout(
-                title=f"Error creating cluster heatmap: {str(e)}",
-                height=300
-            )
-            return fig
+                
+    # Import create_daily_progress_chart function directly
+    from visualizations.charts import create_daily_progress_chart, create_vendor_comparison, create_cluster_heatmap

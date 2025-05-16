@@ -1,14 +1,8 @@
-/* Make the hover area work more reliably but still completely invisible */
-.navbar-trigger:hover + .hidden-navbar,
-.hidden-navbar:hover {
-    height: 48px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    background-color: rgba(0, 0, 0, 0) !important;
-}/* 
+/* 
 assets/styles.css - Custom CSS styles for the dashboard
 
 This file contains all custom styles for the dashboard application, 
-including UI/UX improvements.
+including UI/UX improvements and fixes for proper element containment.
 */
 
 /* Global styles */
@@ -124,6 +118,14 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, textarea, select,
     outline: none;
 }
 
+/* Make the hover area work more reliably but still completely invisible */
+.navbar-trigger:hover + .hidden-navbar,
+.hidden-navbar:hover {
+    height: 48px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
 /* Custom green login button styling */
 #login-nav-button {
     background-color: #27ae60 !important;
@@ -177,6 +179,8 @@ body {
     border-bottom: 1px solid #f0f0f0;
     font-weight: 600;
     padding: 15px 20px;
+    padding-left: 13px !important; /* Increase left padding by 3px */
+    padding-right: 13px !important; /* Increase right padding by 3px */
     font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
 }
 
@@ -427,35 +431,40 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 140px; /* Increased height for normal size */
+    height: 112px; /* Match the reduced height in create_progress_gauge */
     position: relative; /* Enable proper positioning */
+    padding: 0 3px; /* Add horizontal padding to keep elements inside */
 }
 
 .centered-gauge {
     margin: 0 auto !important;
     display: block !important;
-    width: 100% !important; /* Ensure full width */
+    width: calc(100% - 6px) !important; /* Reduce width by 6px (3px on each side) */
     transform-origin: center center;
-    transform: scale(1.0); /* Normal size - no reduction */
 }
 
 /* Fix for percentage overlap */
 .js-plotly-plot .indicator-value {
-    transform: translateY(-5px); /* Move number text up slightly */
+    transform: translateX(3px) !important; /* Shift percentage text slightly right */
     font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif !important;
 }
 
 .js-plotly-plot .indicator-gauge {
-    margin-top: 15px !important; /* Add space above gauge */
+    margin-top: 10px !important; /* Add space above gauge */
 }
 
 /* Ensure gauge ticks are visible */
 .js-plotly-plot .gauge-arc path {
-    stroke-width: 1.5px !important; /* Thicker ticks */
+    stroke-width: 1.2px !important; /* Thicker ticks */
 }
 
 .js-plotly-plot .gauge-circle path {
-    stroke-width: 1.5px !important; /* Thicker circles */
+    stroke-width: 1.2px !important; /* Thicker circles */
+}
+
+/* Ensure legends stay contained */
+.text-center.my-2, .text-center.mt-2 {
+    padding: 0 6px !important; /* Add horizontal padding to center text elements */
 }
 
 /* Increase legend and label sizes */
@@ -495,6 +504,18 @@ body {
         font-size: 1.5rem;
     }
     
+    h3 {
+        font-size: 1.2rem;
+    }
+    
+    h4 {
+        font-size: 1.1rem;
+    }
+    
+    h5 {
+        font-size: 1rem;
+    }
+    
     .login-container {
         margin: 40px auto;
         padding: 20px;
@@ -511,10 +532,6 @@ body {
     
     .metric-card {
         padding: 15px 10px;
-    }
-    
-    .map-container {
-        height: 250px;
     }
     
     /* Improve touch targets for mobile */
@@ -543,6 +560,12 @@ body {
     /* Make sure tables don't overflow */
     .table-responsive {
         overflow-x: auto;
+    }
+    
+    /* Fix vendor and cluster display in public mode */
+    #current-vendor-display,
+    #current-cluster-display {
+        font-size: 0.9rem;
     }
 }
 
@@ -675,478 +698,5 @@ body {
     
     .tv-gauge {
         height: 400px !important;
-    }
-}
-
-/* Mobile Responsive Enhancements */
-@media (max-width: 576px) {
-    .container {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    h2 {
-        font-size: 1.5rem;
-    }
-    
-    h3 {
-        font-size: 1.2rem;
-    }
-    
-    h4 {
-        font-size: 1.1rem;
-    }
-    
-    h5 {
-        font-size: 1rem;
-    }
-    
-    .login-container {
-        margin: 40px auto;
-        padding: 20px;
-        max-width: 90%;
-    }
-    
-    .card-header {
-        padding: 10px 15px;
-    }
-    
-    .card-body {
-        padding: 15px;
-    }
-    
-    .metric-card {
-        padding: 15px 10px;
-    }
-    
-    /* Improve touch targets for mobile */
-    button, .dropdown, .nav-link {
-        min-height: 44px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    
-    /* Adjust filter elements */
-    .filter-section {
-        padding: 10px;
-    }
-    
-    /* Stack date picker better on mobile */
-    .date-range-inputs {
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .date-range-inputs .DateInput {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    /* Make sure tables don't overflow */
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    /* Fix vendor and cluster display in public mode */
-    #current-vendor-display,
-    #current-cluster-display {
-        font-size: 0.9rem;
-    }
-}
-
-/* Specific iPhone/iOS enhancements */
-@supports (-webkit-touch-callout: none) {
-    /* iOS specific styling */
-    input, select, textarea {
-        font-size: 16px !important; /* Prevents auto zoom on focus */
-    }
-    
-    button {
-        -webkit-appearance: none; /* Remove default iOS button styling */
-        border-radius: 8px;
-    }
-}
-
-/* PWA specific styling */
-@media (display-mode: standalone) {
-    /* Add any specific styling when app is in PWA mode */
-    body {
-        -webkit-user-select: none; /* Prevent text selection */
-        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
-    }
-    
-    .navbar {
-        padding-top: env(safe-area-inset-top);
-        height: calc(56px + env(safe-area-inset-top));
-    }
-    
-    .footer {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-}
-
-/* Ensure consistent spacing between form elements */
-.form-element {
-    margin-bottom: 1rem;
-}
-
-/* Keep labels consistent */
-.form-element label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-family: 'Georgia', serif;
-}
-
-/* Ensure calendar appears on top of other elements */
-.DateRangePicker_picker {
-    z-index: 1000 !important;
-}
-
-/* Fix gauge centering */
-.gauge-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.centered-gauge {
-    margin: 0 auto !important;
-    display: block !important;
-}
-
-/* Increase legend and label sizes */
-.legend-text {
-    font-size: 1rem !important;
-    font-family: 'Georgia', serif !important;
-}
-
-.axis-label {
-    font-size: 11px !important;
-    font-family: 'Georgia', serif !important;
-}
-
-.tick text {
-    font-size: 10px !important;
-    font-family: 'Georgia', serif !important;
-}
-
-/* Ensuring chart labels are visible */
-.g-gtitle, .g-xtitle, .g-ytitle {
-    font-size: 12px !important;
-    font-family: 'Georgia', serif !important;
-}
-
-/* Mobile Responsive Enhancements */
-@media (max-width: 576px) {
-    .container {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    h2 {
-        font-size: 1.5rem;
-    }
-    
-    .login-container {
-        margin: 40px auto;
-        padding: 20px;
-        max-width: 90%;
-    }
-    
-    .card-header {
-        padding: 10px 15px;
-    }
-    
-    .card-body {
-        padding: 15px;
-    }
-    
-    .metric-card {
-        padding: 15px 10px;
-    }
-    
-    .map-container {
-        height: 250px;
-    }
-    
-    /* Improve touch targets for mobile */
-    button, .dropdown, .nav-link {
-        min-height: 44px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    
-    /* Adjust filter elements */
-    .filter-section {
-        padding: 10px;
-    }
-    
-    /* Stack date picker better on mobile */
-    .date-range-inputs {
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .date-range-inputs .DateInput {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    /* Make sure tables don't overflow */
-    .table-responsive {
-        overflow-x: auto;
-    }
-}
-
-/* Specific iPhone/iOS enhancements */
-@supports (-webkit-touch-callout: none) {
-    /* iOS specific styling */
-    input, select, textarea {
-        font-size: 16px !important; /* Prevents auto zoom on focus */
-        font-family: 'Georgia', serif !important;
-    }
-    
-    button {
-        -webkit-appearance: none; /* Remove default iOS button styling */
-        border-radius: 8px;
-    }
-}
-
-/* PWA specific styling */
-@media (display-mode: standalone) {
-    /* Add any specific styling when app is in PWA mode */
-    body {
-        -webkit-user-select: none; /* Prevent text selection */
-        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
-    }
-    
-    .navbar {
-        padding-top: env(safe-area-inset-top);
-        height: calc(56px + env(safe-area-inset-top));
-    }
-    
-    .footer {
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-}
-
-/* TV Display Mode */
-@media (min-width: 1600px) {
-    body {
-        font-size: 18px;
-    }
-    
-    h1 {
-        font-size: 3.5rem;
-    }
-    
-    h2 {
-        font-size: 2.8rem;
-    }
-    
-    h3 {
-        font-size: 2.2rem;
-    }
-    
-    h4 {
-        font-size: 1.8rem;
-    }
-    
-    h5 {
-        font-size: 1.5rem;
-    }
-    
-    p {
-        font-size: 1.2rem;
-    }
-    
-    .card-header {
-        padding: 15px 20px;
-        font-size: 1.5rem;
-    }
-    
-    .btn {
-        padding: 12px 24px;
-        font-size: 1.2rem;
-    }
-    
-    /* Increase chart heights for TV */
-    .tv-chart {
-        height: 400px !important;
-    }
-    
-    /* Larger indicators and data points */
-    .tv-gauge {
-        height: 300px !important;
-    }
-    
-    /* Increase padding for better readability */
-    .container {
-        padding: 20px 40px;
-    }
-    
-    /* Larger footer text */
-    footer p {
-        font-size: 1.2rem;
-    }
-    
-    /* Higher contrast for better visibility */
-    .text-muted {
-        color: #555 !important;
-    }
-}
-
-/* Extra adjustments for 4K TVs */
-@media (min-width: 3000px) {
-    body {
-        font-size: 24px;
-    }
-    
-    h1 {
-        font-size: 4.5rem;
-    }
-    
-    h2 {
-        font-size: 3.5rem;
-    }
-    
-    .card-header {
-        padding: 20px 30px;
-        font-size: 2rem;
-    }
-    
-    .btn {
-        padding: 15px 30px;
-        font-size: 1.5rem;
-    }
-    
-    /* Even larger charts for 4K */
-    .tv-chart {
-        height: 600px !important;
-    }
-    
-    .tv-gauge {
-        height: 400px !important;
-    }
-}
-
-/* Mobile Responsive Enhancements */
-@media (max-width: 576px) {
-    .container {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    h2 {
-        font-size: 1.5rem;
-    }
-    
-    h3 {
-        font-size: 1.2rem;
-    }
-    
-    h4 {
-        font-size: 1.1rem;
-    }
-    
-    h5 {
-        font-size: 1rem;
-    }
-    
-    .login-container {
-        margin: 40px auto;
-        padding: 20px;
-        max-width: 90%;
-    }
-    
-    .card-header {
-        padding: 10px 15px;
-    }
-    
-    .card-body {
-        padding: 15px;
-    }
-    
-    .metric-card {
-        padding: 15px 10px;
-    }
-    
-    /* Improve touch targets for mobile */
-    button, .dropdown, .nav-link {
-        min-height: 44px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    
-    /* Adjust filter elements */
-    .filter-section {
-        padding: 10px;
-    }
-    
-    /* Stack date picker better on mobile */
-    .date-range-inputs {
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .date-range-inputs .DateInput {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-    
-    /* Make sure tables don't overflow */
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    /* Fix vendor and cluster display in public mode */
-    #current-vendor-display,
-    #current-cluster-display {
-        font-size: 0.9rem;
-    }
-}
-
-/* Specific iPhone/iOS enhancements */
-@supports (-webkit-touch-callout: none) {
-    /* iOS specific styling */
-    input, select, textarea {
-        font-size: 16px !important; /* Prevents auto zoom on focus */
-    }
-    
-    button {
-        -webkit-appearance: none; /* Remove default iOS button styling */
-        border-radius: 8px;
-    }
-}
-
-/* PWA specific styling */
-@media (display-mode: standalone) {
-    /* Add any specific styling when app is in PWA mode */
-    body {
-        -webkit-user-select: none; /* Prevent text selection */
-        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
-    }
-    
-    .navbar {
-        padding-top: env(safe-area-inset-top);
-        height: calc(56px + env(safe-area-inset-top));
-    }
-    
-    .footer {
-        padding-bottom: env(safe-area-inset-bottom);
     }
 }

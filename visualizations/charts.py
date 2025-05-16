@@ -1,8 +1,8 @@
 """
-visualizations/charts.py - Chart creation functions
+visualizations/charts.py - Complete charts file with all functions
 
-This file contains functions to create various charts and visualizations
-for the dashboard.
+This file contains all chart creation functions including the improved progress gauge
+and the missing create_daily_progress_chart function.
 """
 
 import plotly.express as px
@@ -11,7 +11,6 @@ from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
 from data_processing import get_daily_progress, get_vendor_progress, get_cluster_progress
-import plotly.graph_objects as go
 
 # Define theme colors
 EMERALD = "#2ecc71"
@@ -19,14 +18,10 @@ DARK_GREEN = "#27ae60"
 LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
 
-"""
-Update to visualizations/charts.py to optimize the progress gauge for fixed-size cards
-"""
-
 def create_progress_gauge(percent_complete):
     """
-    Create a gauge chart for overall progress with normal size
-    and properly visible markers and percentage.
+    Create a gauge chart for overall progress with 20% reduced size
+    to fit perfectly in cards while maintaining visibility of all elements.
     
     Args:
         percent_complete (float): Percentage completion value
@@ -39,89 +34,46 @@ def create_progress_gauge(percent_complete):
     fig.add_trace(go.Indicator(
         mode="gauge+number",
         value=percent_complete,
-        domain={'x': [0, 1], 'y': [0, 1]},  # Full domain for normal size
+        domain={'x': [0, 1], 'y': [0, 1]},
         gauge={
             'axis': {
-                'range': [0, 100],  # Explicit range from 0 to 100
-                'tickwidth': 1.5,  # Wider ticks for visibility
-                'tickcolor': "#555555",  # Darker tick color
+                'range': [0, 100],
+                'tickwidth': 1.2,  # Slightly thinner ticks
+                'tickcolor': "#555555",
                 'visible': True,
-                'tickfont': {'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'size': 12},  # Larger font
-                'tickmode': 'array',  # Set explicit tick values
-                'tickvals': [0, 20, 40, 60, 80, 100],  # Force specific tick values
-                'ticktext': ['0', '20', '40', '60', '80', '100'],  # Force specific tick labels
-                'showticklabels': True,  # Ensure tick labels are shown
+                'tickfont': {'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'size': 10},  # Reduced font size by 20%
+                'tickmode': 'array',
+                'tickvals': [0, 20, 40, 60, 80, 100],
+                'ticktext': ['0', '20', '40', '60', '80', '100'],
+                'showticklabels': True,
             },
-            'bar': {'color': EMERALD, 'thickness': 0.7},  # Normal thickness
+            'bar': {'color': EMERALD, 'thickness': 0.6},  # Reduced thickness by 20%
             'bgcolor': "white",
             'borderwidth': 0,
             'steps': [
                 {'range': [0, 100], 'color': LIGHT_GREEN}
             ],
             'threshold': {
-                'line': {'color': "red", 'width': 2},
-                'thickness': 0.75,
+                'line': {'color': "red", 'width': 1.6},  # Reduced width by 20%
+                'thickness': 0.6,  # Reduced thickness by 20%
                 'value': 90
             }
         },
         number={
             'suffix': "%", 
-            'font': {'size': 28, 'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'color': DARK_GREEN},  # Larger size
-            'valueformat': '.1f',  # One decimal place
+            'font': {'size': 22, 'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'color': DARK_GREEN},  # Reduced size by 20%
+            'valueformat': '.1f',
+            'prefix': ' '  # Add a small space before the number to shift it inward
         }
     ))
     
-    # Update layout to ensure proper display
+    # Update layout with 20% reduced height and adjusted internal padding
     fig.update_layout(
-        margin=dict(l=20, r=20, t=40, b=20),  # Adjusted margins to ensure markers are visible
+        margin=dict(l=19, r=19, t=20, b=19),  # Increased horizontal and bottom margins by 3px to bring content inward
         paper_bgcolor="white",
-        autosize=True,  # Enable autosize for responsive behavior
-        height=140,  # Normal height - increased from previous
-        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",  # Palatino font family
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False)
-    )
-    
-    return fig
-    # Update layout to ensure proper display
-    fig.update_layout(
-        margin=dict(l=20, r=20, t=30, b=30),  # Increased margins to ensure markers are visible
-        paper_bgcolor="white",
-        autosize=True,  # Enable autosize for responsive behavior
-        height=95,  # Reduced height (15% less than original 110px)
-        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",  # Palatino font family
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        annotations=[
-            dict(
-                x=0.5,
-                y=0,
-                xref="paper",
-                yref="paper",
-                showarrow=False,
-                font=dict(
-                    family="Palatino Linotype, Book Antiqua, Palatino, serif",
-                    size=10,
-                    color="#666666"
-                )
-            )
-        ]
-    )
-    
-    return fig
-    
-    # Update layout for proper centering and responsive behavior
-    fig.update_layout(
-        # Remove all margins to ensure centering
-        margin=dict(l=0, r=0, t=0, b=0),
-        paper_bgcolor="white",
-        # Use autosize for better container fitting
         autosize=True,
-        # Set a reasonable height that works well in cards
-        height=20,
-        # Font settings for all text elements
-        font_family="Georgia",
-        # Make sure the gauge fits well in its container
+        height=112,  # Reduced height by 20% (from 140)
+        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",
         xaxis=dict(visible=False),
         yaxis=dict(visible=False)
     )
@@ -229,93 +181,131 @@ def create_daily_progress_chart(dataframe, filtered_date_columns=None):
     )
     
     return fig
+
 def create_vendor_comparison(dataframe):
     """
     Create a bar chart comparing vendor performance.
     
     Args:
-        dataframe (pandas.DataFrame): The remediation data
+        dataframe (pandas.DataFrame): The remediation data or vendor stats
         
     Returns:
         plotly.graph_objects.Figure: Bar chart figure
     """
-    # Check if dataframe is empty
-    if dataframe.empty:
-        fig = go.Figure()
-        fig.update_layout(
-            title="No data available for vendor comparison",
-            height=300
-        )
-        return fig
-    
-    # Get latest date column
-    date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
-    
-    if not date_columns:
-        fig = go.Figure()
-        fig.update_layout(
-            title="No date data available for vendor comparison",
-            height=300
-        )
-        return fig
-    
-    latest_date_col = date_columns[-1]
-    
-    # Group by vendor
-    try:
-        vendor_stats = dataframe.groupby('Vendor').agg({
-            'Quantity to be remediated in MT': 'sum',
-            latest_date_col: 'sum'
-        }).reset_index()
+    # Check if dataframe is a vendor stats dataframe (from metrics)
+    if 'Vendor' in dataframe.columns and 'Percent Complete' in dataframe.columns:
+        vendor_stats = dataframe
         
-        # Check if we have any data
-        if vendor_stats.empty or len(vendor_stats) == 0:
+        # Get latest date column for the vendor stats
+        date_columns = [col for col in vendor_stats.columns if col.startswith('Cumulative Quantity') or col.endswith('MT')]
+        latest_date_col = date_columns[-1] if date_columns else None
+        
+        if latest_date_col is None:
             fig = go.Figure()
             fig.update_layout(
-                title="No vendor data available for the selected filters",
+                title="No date data available for vendor comparison",
+                height=300
+            )
+            return fig
+    else:
+        # This is raw data, check if it's empty
+        if dataframe.empty:
+            fig = go.Figure()
+            fig.update_layout(
+                title="No data available for vendor comparison",
                 height=300
             )
             return fig
         
-        # Create the figure
+        # Get latest date column
+        date_columns = [col for col in dataframe.columns if col.startswith('Cumulative Quantity')]
+        
+        if not date_columns:
+            fig = go.Figure()
+            fig.update_layout(
+                title="No date data available for vendor comparison",
+                height=300
+            )
+            return fig
+        
+        latest_date_col = date_columns[-1]
+        
+        # Group by vendor
+        try:
+            vendor_stats = dataframe.groupby('Vendor').agg({
+                'Quantity to be remediated in MT': 'sum',
+                latest_date_col: 'sum'
+            }).reset_index()
+            
+            # Calculate percent complete
+            vendor_stats['Percent Complete'] = 0.0
+            mask = vendor_stats['Quantity to be remediated in MT'] > 0
+            if mask.any():
+                vendor_stats.loc[mask, 'Percent Complete'] = (
+                    vendor_stats.loc[mask, latest_date_col] / 
+                    vendor_stats.loc[mask, 'Quantity to be remediated in MT'] * 100
+                ).round(1)
+        except Exception as e:
+            print(f"Error calculating vendor stats: {e}")
+            fig = go.Figure()
+            fig.update_layout(
+                title=f"Error creating vendor comparison: {str(e)}",
+                height=300
+            )
+            return fig
+    
+    # Check if we have any data
+    if vendor_stats.empty or len(vendor_stats) == 0:
         fig = go.Figure()
-        
-        fig.add_trace(go.Bar(
-            x=vendor_stats['Vendor'],
-            y=vendor_stats['Quantity to be remediated in MT'],
-            name='Target',
-            marker_color='#8B4513'
-        ))
-        
+        fig.update_layout(
+            title="No vendor data available for the selected filters",
+            height=300
+        )
+        return fig
+    
+    # Create the figure
+    fig = go.Figure()
+    
+    # Targets
+    target_col = 'Quantity to be remediated in MT'
+    if target_col not in vendor_stats.columns:
+        # Try to find another suitable column
+        possible_cols = [col for col in vendor_stats.columns if 'MT' in col]
+        if possible_cols:
+            target_col = possible_cols[0]
+        else:
+            # If we can't find a suitable column, create a dummy one
+            vendor_stats[target_col] = 100
+    
+    fig.add_trace(go.Bar(
+        x=vendor_stats['Vendor'],
+        y=vendor_stats[target_col],
+        name='Target',
+        marker_color='#8B4513'  # SaddleBrown color
+    ))
+    
+    # Completed
+    if latest_date_col in vendor_stats.columns:
         fig.add_trace(go.Bar(
             x=vendor_stats['Vendor'],
             y=vendor_stats[latest_date_col],
             name='Completed',
-            marker_color='#2E8B57'
+            marker_color='#2E8B57'  # SeaGreen color
         ))
-        
-        fig.update_layout(
-            title="Vendor Performance Comparison",
-            xaxis_title='Vendor',
-            yaxis_title='Quantity (MT)',
-            barmode='group',
-            margin=dict(l=40, r=40, t=60, b=40),
-            plot_bgcolor='white',
-            hovermode='x unified',
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            height=300
-        )
-        
-        return fig
-        
-    except Exception as e:
-        print(f"Error in create_vendor_comparison: {e}")
-        fig = go.Figure()
-        fig.update_layout(
-            title=f"Error creating vendor comparison: {str(e)}",
-            height=300
-        )
-        return fig
+    
+    fig.update_layout(
+        title="Vendor Performance Comparison",
+        xaxis_title='Vendor',
+        yaxis_title='Quantity (MT)',
+        barmode='group',
+        margin=dict(l=40, r=40, t=60, b=40),
+        plot_bgcolor='white',
+        hovermode='x unified',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=300
+    )
+    
+    return fig
 
 def create_cluster_heatmap(dataframe):
     """
@@ -407,7 +397,7 @@ def create_cluster_heatmap(dataframe):
             height=300
         )
         return fig
-    
+
 def create_completion_timeline(dataframe):
     """
     Create a timeline chart showing projected completion.

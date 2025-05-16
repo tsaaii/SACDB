@@ -1,7 +1,7 @@
 """
-layouts/dashboard_layout.py - Dashboard page layout
+layouts/dashboard_layout.py - Updated dashboard layout with improved progress gauge and responsive summary cards
 
-This file defines the dashboard layout with all visualizations and controls.
+This file defines the updated dashboard layout to work with the improved callbacks.
 """
 
 from dash import html, dcc
@@ -46,9 +46,13 @@ def create_dashboard_layout():
         
         # Main content
         dbc.Container([
-            # Welcome message and date
+            # Welcome message and date - Now with dynamic title based on filters
             html.Div([
-                html.H1("Swaccha Andhra Dashboard", className="my-4", style={"color": DARK_GREEN}),
+                # Use ID to make this responsive to filters
+                html.Div(
+                    html.H1("Swaccha Andhra Dashboard", className="my-4", style={"color": DARK_GREEN}),
+                    id="filtered-metrics-title"
+                ),
                 html.P(f"Data as of {metrics['latest_date']}", className="lead"),
             ], className="mb-4"),
             
@@ -56,7 +60,7 @@ def create_dashboard_layout():
             html.Div(id="dashboard-tv-clock", className="text-end mb-2 text-muted", 
                     style={"fontSize": "1rem"}),
             
-            # Summary cards
+            # Summary cards - now with IDs for dynamic updates
             create_summary_cards(),
             
             # Filters
@@ -159,6 +163,7 @@ def create_navbar():
             ),
             dbc.Nav([
                 dbc.NavItem(dbc.NavLink("Dashboard", href="/dashboard", active=True, className="text-white")),
+                dbc.NavItem(dbc.NavLink("Uploader", href="/uploader", className="text-white")),
                 dbc.NavItem(dbc.NavLink("Reports", href="#", className="text-white")),
                 dbc.NavItem(dbc.NavLink("Settings", href="#", className="text-white")),
                 dbc.NavItem(dbc.Button("Logout", id="logout-button", color="light", size="sm", className="ms-2")),
@@ -170,7 +175,7 @@ def create_navbar():
 
 def create_summary_cards():
     """
-    Create summary metric cards with fixed size of 416 x 196 pixels.
+    Create summary metric cards with fixed size, now with IDs to make them dynamic.
     
     Returns:
         dash component: Row of uniform-sized summary cards
@@ -202,43 +207,55 @@ def create_summary_cards():
     }
     
     return dbc.Row([
-        # Total target card
+        # Total target card - with ID for dynamic updates
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Total Waste Target", className="card-title mb-3"),
-                    html.H2(f"{total_target:,.0f} MT", className="text-primary mb-3"),
-                    html.P("Total waste to be remediated", className="card-text text-muted mb-0")
+                    html.Div([
+                        html.H5("Total Waste Target", className="card-title mb-3"),
+                        html.H2(f"{total_target:,.0f} MT", className="text-primary mb-3"),
+                        html.P("Total waste to be remediated", className="card-text text-muted mb-0")
+                    ], id="total-target-card")
                 ], style=card_body_style)
             ], style=card_style)
         ], md=4, className="mb-4"),
         
-        # Remediated card
+        # Remediated card - with ID for dynamic updates
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Remediated So Far", className="card-title mb-3"),
-                    html.H2(f"{total_remediated:,.0f} MT", className="text-success mb-3"),
-                    html.P(f"As of {metrics['latest_date']}", className="card-text text-muted mb-0")
+                    html.Div([
+                        html.H5("Remediated So Far", className="card-title mb-3"),
+                        html.H2(f"{total_remediated:,.0f} MT", className="text-success mb-3"),
+                        html.P(f"As of {metrics['latest_date']}", className="card-text text-muted mb-0")
+                    ], id="total-remediated-card")
                 ], style=card_body_style)
             ], style=card_style)
         ], md=4, className="mb-4"),
         
-        # Progress card
+        # Progress card - with ID and improved gauge styling
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Overall Progress", className="card-title mb-2"),
-                    dcc.Graph(
-                        figure=create_progress_gauge(percent_complete),
-                        config={'displayModeBar': False},
-                        style={
-                            'height': '100px', 
-                            'margin': '0 auto',
-                            'marginBottom': '8px'
-                        }
-                    ),
-                    html.P(f"{percent_complete:.1f}% Complete", className="card-text text-center mb-0")
+                    html.Div([
+                        html.H5("Overall Progress", className="card-title mb-2"),
+                        # Wrap the gauge in a proper container for responsive centering
+                        html.Div([
+                            dcc.Graph(
+                                figure=create_progress_gauge(percent_complete),
+                                config={'displayModeBar': False},
+                                className="centered-gauge",
+                                style={
+                                    'height': '140px',  # Increased height
+                                    'margin': '0 auto',
+                                    'display': 'block'
+                                }
+                            )
+                        ], className="d-flex justify-content-center align-items-center gauge-container"),
+                        html.P(f"{percent_complete:.1f}% Complete", 
+                              className="card-text text-center mt-2 mb-0", 
+                              style={"fontSize": "1.2rem", "fontWeight": "500", "color": DARK_GREEN})
+                    ], id="progress-gauge-card")
                 ], style=card_body_style)
             ], style=card_style)
         ], md=4, className="mb-4")
@@ -365,16 +382,6 @@ def create_ulb_table(dataframe):
             ulb_data.loc[mask, latest_date_col] / 
             ulb_data.loc[mask, 'Quantity to be remediated in MT'] * 100
         ).round(1)
-    # Prepare table columns
-    columns = [
-        {"name": "ULB", "id": "ULB"},
-        {"name": "Cluster", "id": "Cluster"},
-        {"name": "Vendor", "id": "Vendor"},
-        {"name": "Target (MT)", "id": "Quantity to be remediated in MT", "type": "numeric", "format": {"specifier": ",.0f"}},
-        {"name": "April (MT)", "id": "Quantity remediated upto 30th April 2025 in MT", "type": "numeric", "format": {"specifier": ",.0f"}},
-        {"name": f"Current (MT)", "id": latest_date_col, "type": "numeric", "format": {"specifier": ",.0f"}},
-        {"name": "Completion %", "id": "Percent Complete", "type": "numeric", "format": {"specifier": ".1f"}}
-    ]
     
     return dbc.Table.from_dataframe(
         ulb_data, 
@@ -383,106 +390,3 @@ def create_ulb_table(dataframe):
         hover=True,
         responsive=True
     )
-
-def create_dashboard_layout():
-    """
-    Create the dashboard layout with visualizations.
-    
-    Returns:
-        dash component: The dashboard layout
-    """
-    return html.Div([
-        # Navbar
-        create_navbar(),
-        
-        # Main content
-        dbc.Container([
-            # Welcome message and date
-            html.Div([
-                html.H1("Swaccha Andhra Dashboard", className="my-4", style={"color": DARK_GREEN}),
-                html.P(f"Data as of {metrics['latest_date']}", className="lead"),
-            ], className="mb-4"),
-            
-            # Summary cards
-            create_summary_cards(),
-            
-            # Filters
-            create_filters(),
-            
-            # Charts
-            dbc.Row([
-                # Daily progress chart
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(html.H5("Daily Remediation Progress")),
-                        dbc.CardBody([
-                            dcc.Graph(
-                                id='daily-progress-chart',
-                                figure=create_daily_progress_chart(df),
-                                style={'height': '300px'}
-                            )
-                        ])
-                    ], className="mb-4")
-                ], width=12),
-                
-                # Vendor comparison
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(html.H5("Vendor Performance")),
-                        dbc.CardBody([
-                            dcc.Graph(
-                                id='vendor-comparison-chart',
-                                figure=create_vendor_comparison(metrics['vendor_stats']),
-                                style={'height': '300px'}
-                            )
-                        ])
-                    ], className="mb-4")
-                ], width=6),
-                
-                # Cluster heatmap
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(html.H5("Cluster Progress")),
-                        dbc.CardBody([
-                            dcc.Graph(
-                                id='cluster-heatmap',
-                                figure=create_cluster_heatmap(df),
-                                style={'height': '300px'}
-                            )
-                        ])
-                    ], className="mb-4")
-                ], width=6),
-                
-                # Map visualization
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(html.H5("Geographic Remediation Status")),
-                        dbc.CardBody([
-                            html.Div(id='map-container', children=[
-                                html.Iframe(
-                                    id='remediation-map',
-                                    srcDoc=create_remediation_map(df),
-                                    style={'width': '100%', 'height': '400px', 'border': 'none'}
-                                )
-                            ])
-                        ])
-                    ], className="mb-4")
-                ], width=12),
-                
-                # ULB detailed data
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(html.H5("ULB Details")),
-                        dbc.CardBody([
-                            html.Div(id='ulb-details-table', children=[
-                                create_ulb_table(df)
-                            ])
-                        ])
-                    ], className="mb-4")
-                ], width=12)
-            ])
-        ], className="mt-4"),
-        
-        # Add footer
-        create_footer()
-    ])
