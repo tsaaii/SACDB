@@ -25,6 +25,14 @@ BG_COLOR = "#f1f9f5"
 df = load_data()
 metrics = get_dashboard_metrics(df)
 
+def get_uploader_layout():
+    """
+    Dynamically import the uploader layout to avoid circular imports.
+    """
+    from layouts.uploader_layout import create_uploader_layout
+    return create_uploader_layout()
+
+
 def create_dashboard_layout():
     """
     Create the dashboard layout with visualizations.

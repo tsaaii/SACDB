@@ -16,6 +16,12 @@ DARK_GREEN = "#27ae60"
 LIGHT_GREEN = "#a9dfbf"
 BG_COLOR = "#f1f9f5"
 
+def get_uploader_layout():
+    """
+    Dynamically import the uploader layout to avoid circular imports.
+    """
+    from layouts.uploader_layout import create_uploader_layout
+    return create_uploader_layout()
 
 def get_enhanced_public_landing():
     """
@@ -258,6 +264,10 @@ def display_page(pathname, is_authenticated):
         else:
             return create_dashboard_layout()
     elif pathname == '/login':
+        return create_login_layout()
+    elif pathname == '/uploader':
+        if is_authenticated:
+            return get_uploader_layout()
         return create_login_layout()
     elif pathname == '/dashboard':
         if is_authenticated:
