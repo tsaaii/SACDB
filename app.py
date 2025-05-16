@@ -1,7 +1,5 @@
 """
-app.py - Fixed version with proper callback registration
-
-This version ensures all callbacks are registered correctly with no duplicate registration.
+Modified app.py for Google Cloud Platform deployment
 """
 
 import dash
@@ -13,17 +11,12 @@ import os
 import time
 import threading
 from callbacks.enhanced_public_callbacks import register_enhanced_public_callbacks
-from auth import load_user, User, users
-from layouts.main_layout import create_main_layout
-from callbacks.auth_callbacks import register_auth_callbacks
-from callbacks.dashboard_callbacks import register_dashboard_callbacks
-from callbacks.uploader_callbacks import register_uploader_callbacks
-from data_processing import load_data
 
-# Create a Flask server
+
+# Create a Flask server - Using environment variables for production
 server = flask.Flask(__name__)
 server.config.update(
-    SECRET_KEY='your_secret_key_here'
+    SECRET_KEY=os.environ.get('SECRET_KEY', 'your_default_secret_key_here')  # Get from environment in production
 )
 
 # Create a login manager
@@ -36,8 +29,6 @@ from auth import load_user, User, users
 from layouts.main_layout import create_main_layout
 from callbacks.auth_callbacks import register_auth_callbacks
 from callbacks.dashboard_callbacks import register_dashboard_callbacks
-# Remove this import since we're using enhanced_public_callbacks directly
-# from callbacks.public_landing_callbacks import register_public_landing_callbacks
 from data_processing import load_data
 
 # Global variable to track when data file was last modified
@@ -49,7 +40,9 @@ def watch_data_file():
     
     # Initialize with current modification time
     try:
-        DATA_FILE_LAST_MODIFIED = os.path.getmtime('data.csv')
+        # Use environment variable for data file path in production
+        data_file = os.environ.get('DATA_FILE', 'data.csv')
+        DATA_FILE_LAST_MODIFIED = os.path.getmtime(data_file)
         print(f"Initial data file timestamp: {time.ctime(DATA_FILE_LAST_MODIFIED)}")
     except Exception as e:
         print(f"Error getting initial file timestamp: {e}")
@@ -57,13 +50,13 @@ def watch_data_file():
     # Start watching for changes
     while True:
         try:
-            current_modified = os.path.getmtime('data.csv')
+            data_file = os.environ.get('DATA_FILE', 'data.csv')
+            current_modified = os.path.getmtime(data_file)
             if current_modified > DATA_FILE_LAST_MODIFIED:
                 print(f"Data file changed at {time.ctime(current_modified)}")
                 DATA_FILE_LAST_MODIFIED = current_modified
                 
                 # Clear any cached data to force a reload
-                # This assumes your load_data function has caching
                 load_data(force_reload=True)
                 
         except Exception as e:
@@ -72,13 +65,14 @@ def watch_data_file():
         # Sleep for a few seconds before checking again
         time.sleep(5)  # Check every 5 seconds
 
-# Start the file watcher thread
-@server.before_first_request
-def start_file_watcher():
-    watcher_thread = threading.Thread(target=watch_data_file)
-    watcher_thread.daemon = True  # This ensures the thread will close when the main app closes
-    watcher_thread.start()
-    print("Data file watcher thread started")
+# Start the file watcher thread - Only for development mode
+if os.environ.get('DASH_ENV') != 'production':
+    @server.before_first_request
+    def start_file_watcher():
+        watcher_thread = threading.Thread(target=watch_data_file)
+        watcher_thread.daemon = True  # This ensures the thread will close when the main app closes
+        watcher_thread.start()
+        print("Data file watcher thread started")
 
 @login_manager.user_loader
 def load_user_callback(user_id):
@@ -143,12 +137,10 @@ app.index_string = '''
 # Set up the app layout
 app.layout = create_main_layout()
 
-# Register callbacks - IMPORTANT: only register each callback group once!
+# Register callbacks - only register each callback group once!
 register_auth_callbacks(app)
 register_dashboard_callbacks(app)
-# Only use enhanced version, not both
 register_enhanced_public_callbacks(app)  
-register_uploader_callbacks(app)
 
 # Add endpoint to get last modified time
 @server.route('/api/data-modified-time')
@@ -156,12 +148,25 @@ def get_data_modified_time():
     global DATA_FILE_LAST_MODIFIED
     return {'timestamp': DATA_FILE_LAST_MODIFIED, 'formatted': time.ctime(DATA_FILE_LAST_MODIFIED)}
 
+# Add health check endpoint for Cloud Run
+@server.route('/health')
+def health_check():
+    return {'status': 'healthy', 'timestamp': time.time()}
+
 if __name__ == '__main__':
-    # Start the file watcher here for development mode
-    watcher_thread = threading.Thread(target=watch_data_file)
-    watcher_thread.daemon = True
-    watcher_thread.start()
-    print("Data file watcher thread started (development mode)")
+    # Get port from environment variable for Cloud Run
+    port = int(os.environ.get('PORT', 8080))
+    # Get host from environment variable
+    host = os.environ.get('HOST', '0.0.0.0')
+    # Get debug state from environment
+    debug = os.environ.get('DASH_ENV') != 'production'
     
-    # Enable dev tools for better debugging
-    app.run(debug=True, port=8050, dev_tools_ui=True, dev_tools_props_check=True)
+    # Start the file watcher for development mode
+    if debug:
+        watcher_thread = threading.Thread(target=watch_data_file)
+        watcher_thread.daemon = True
+        watcher_thread.start()
+        print("Data file watcher thread started (development mode)")
+    
+    # Run the app
+    app.run(debug=debug, port=port, host=host)

@@ -7,20 +7,46 @@ the waste remediation data.
 
 import pandas as pd
 import json
+import os
+from functools import lru_cache
 
-def load_data():
+def load_data(force_reload=False):
     """
     Load data from CSV and perform initial cleaning.
+    Uses caching to improve performance but allows for forced reload.
+    
+    Args:
+        force_reload (bool): Whether to force reload the data
     
     Returns:
         pandas.DataFrame: Cleaned data frame
     """
-    df = pd.read_csv('data.csv')
+    # If force_reload is True, clear the cache
+    if force_reload:
+        load_data.cache_clear()
+    
+    return _load_data_cached()
+
+@lru_cache(maxsize=1)
+
+
+def _load_data_cached():
+    """
+    Cached version of load_data function.
+    
+    Returns:
+        pandas.DataFrame: Cleaned data frame
+    """
+    # Get data file path from environment variable or use default
+    data_file = os.environ.get('DATA_FILE', 'data.csv')
+    
+    df = pd.read_csv(data_file)
     
     # Clean column names and data
     df['Cluster'] = df['Cluster'].str.strip()
     
     return df
+
 
 def get_dashboard_metrics(dataframe):
     """
@@ -109,6 +135,7 @@ def get_dashboard_metrics(dataframe):
         'cluster_stats': cluster_stats,
         'ulb_stats': ulb_stats
     }
+
 
 def get_daily_progress(dataframe):
     """
