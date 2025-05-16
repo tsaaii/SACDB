@@ -1,8 +1,8 @@
 """
-layouts/uploader_layout.py - File Uploader page
+layouts/uploader_layout.py - Improved file uploader page
 
-This file defines the file uploader page layout with file validation for the naming pattern:
-Legacy Waste Status_{dd}.{mm}.{yyyy}.xlsx
+This file defines the enhanced file uploader page layout with clearer instructions,
+better feedback, and a more user-friendly interface.
 """
 
 from dash import html, dcc
@@ -48,7 +48,7 @@ def create_navbar():
 
 def create_uploader_layout():
     """
-    Create the uploader page layout with file validation for data uploads.
+    Create the enhanced uploader page layout with improved user experience.
     
     Returns:
         dash component: The uploader layout
@@ -65,11 +65,60 @@ def create_uploader_layout():
                 html.P("Upload waste remediation data files in XLSX format.", className="lead"),
             ], className="mb-4"),
             
+            # Step-by-step instructions card
+            dbc.Card([
+                dbc.CardHeader(html.H5("How to Upload Data")),
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Div([
+                                dbc.Badge("1", color="primary", className="me-2 p-2"),
+                                "Prepare your Excel file with the required columns"
+                            ], className="d-flex align-items-center mb-3"),
+                            
+                            html.Div([
+                                dbc.Badge("2", color="primary", className="me-2 p-2"),
+                                "Name the file following the pattern: Legacy Waste Status_DD.MM.YYYY.xlsx"
+                            ], className="d-flex align-items-center mb-3"),
+                            
+                            html.Div([
+                                dbc.Badge("3", color="primary", className="me-2 p-2"),
+                                "Click 'Select a File' and choose your Excel file"
+                            ], className="d-flex align-items-center mb-3"),
+                        ], md=6),
+                        
+                        dbc.Col([
+                            html.Div([
+                                dbc.Badge("4", color="primary", className="me-2 p-2"),
+                                "Wait for validation to complete"
+                            ], className="d-flex align-items-center mb-3"),
+                            
+                            html.Div([
+                                dbc.Badge("5", color="primary", className="me-2 p-2"),
+                                "Click 'Process File' to upload and process"
+                            ], className="d-flex align-items-center mb-3"),
+                            
+                            html.Div([
+                                dbc.Badge("6", color="primary", className="me-2 p-2"),
+                                "The system will update the dashboard with new data"
+                            ], className="d-flex align-items-center mb-3"),
+                        ], md=6),
+                    ]),
+                    
+                    html.Div([
+                        html.P([
+                            html.Strong("Required Columns: "),
+                            "Vendor, Cluster, ULB, Quantity to be remediated in MT"
+                        ], className="mb-1 bg-light p-2 rounded"),
+                    ], className="mt-2"),
+                ])
+            ], className="mb-4"),
+            
             # Upload Component Card
             dbc.Card([
                 dbc.CardHeader(html.H5("Upload Data File")),
                 dbc.CardBody([
-                    # File upload component with explicit accept property for Excel files
+                    # File upload component with explicit instructions
                     dcc.Upload(
                         id='upload-data',
                         children=html.Div([
@@ -79,49 +128,44 @@ def create_uploader_layout():
                         ]),
                         style={
                             'width': '100%',
-                            'height': '60px',
-                            'lineHeight': '60px',
-                            'borderWidth': '1px',
+                            'height': '80px',  # Increased height for better touch target
+                            'lineHeight': '80px',
+                            'borderWidth': '2px',  # Thicker border
                             'borderStyle': 'dashed',
-                            'borderRadius': '5px',
+                            'borderRadius': '8px',
+                            'borderColor': LIGHT_GREEN,
                             'textAlign': 'center',
                             'margin': '10px 0',
-                            'cursor': 'pointer'
+                            'cursor': 'pointer',
+                            'backgroundColor': '#f8f9fa'
                         },
                         # Set accept property to only allow Excel files
-                        accept='.xlsx',
+                        accept='.xlsx, .xls',
                         # Allow only single file upload
                         multiple=False
                     ),
                     
-                    # Detailed instructions with example
+                    # Example file pattern
                     html.Div([
                         html.P([
-                            html.Strong("Important: "),
-                            "File must follow the naming pattern:"
-                        ], className="mb-1 mt-3"),
-                        html.Code("Legacy Waste Status_{dd}.{mm}.{yyyy}.xlsx", 
-                                 className="d-block p-2 bg-light rounded", 
-                                 style={"fontFamily": "monospace"}),
+                            html.Strong("File naming pattern: "),
+                            html.Code("Legacy Waste Status_DD.MM.YYYY.xlsx", 
+                                     className="p-2 bg-light rounded", 
+                                     style={"fontFamily": "monospace"})
+                        ], className="mt-3 mb-1"),
                         html.P([
                             html.Strong("Example: "),
                             html.Code("Legacy Waste Status_15.05.2025.xlsx", 
                                       style={"backgroundColor": LIGHT_GREEN})
-                        ], className="mt-2", 
+                        ], className="mb-3", 
                            style={"fontSize": "0.9rem"}),
-                        html.P([
-                            html.I(className="fas fa-info-circle me-2", style={"color": ACCENT_BLUE}),
-                            "Files will be saved to the ", 
-                            html.Code("data", style={"backgroundColor": LIGHT_GREEN}),
-                            " folder and used to update the dashboard."
-                        ], className="mt-3 small p-2 rounded", style={"backgroundColor": "#e7f5ff"})
-                    ], className="mt-3"),
+                    ]),
                     
                     # Alert for upload status
                     dbc.Alert(
                         id="upload-alert",
                         is_open=False,
-                        duration=5000,  # Auto-dismiss after 5 seconds
+                        duration=10000,  # Auto-dismiss after 10 seconds
                         dismissable=True,
                         className="mt-3"
                     ),
@@ -132,24 +176,35 @@ def create_uploader_layout():
                         value=0,
                         striped=True,
                         animated=True,
-                        className="mt-3",
-                        style={"display": "none"}
-                    ),
-                    
-                    # Upload button (optional if you want explicit upload instead of automatic)
-                    dbc.Button(
-                        [html.I(className="fas fa-upload me-2"), "Process File"],
-                        id="process-upload-button",
                         color="success",
                         className="mt-3",
+                        style={"display": "none", "height": "15px"}
+                    ),
+                    
+                    # Process button - larger and more visible
+                    dbc.Button(
+                        [
+                            html.I(className="fas fa-cogs me-2"), 
+                            "Process File"
+                        ],
+                        id="process-upload-button",
+                        color="success",
+                        size="lg",
+                        className="mt-4 w-100",
                         disabled=True
-                    )
+                    ),
+                    
+                    # Debug info (hidden in production)
+                    html.Div(id="debug-info", className="mt-3 small text-muted d-none")
                 ])
-            ], className="mb-4"),
+            ], className="mb-4 shadow-sm"),
             
             # Recent Uploads Table Card
             dbc.Card([
-                dbc.CardHeader(html.H5("Recent Uploads")),
+                dbc.CardHeader([
+                    html.H5("Recent Uploads"),
+                    html.Span(id="upload-count", className="badge bg-secondary ms-2")
+                ], className="d-flex align-items-center"),
                 dbc.CardBody([
                     html.Div(
                         id="recent-uploads-table",
@@ -169,12 +224,13 @@ def create_uploader_layout():
                                 bordered=True,
                                 hover=True,
                                 responsive=True,
-                                striped=True
+                                striped=True,
+                                className="align-middle"
                             )
                         ]
                     )
                 ])
-            ])
+            ], className="shadow-sm")
         ], className="mt-4"),
         
         # Store for holding the current upload file info

@@ -148,6 +148,7 @@ register_auth_callbacks(app)
 register_dashboard_callbacks(app)
 # Only use enhanced version, not both
 register_enhanced_public_callbacks(app)  
+register_uploader_callbacks(app)
 
 # Add endpoint to get last modified time
 @server.route('/api/data-modified-time')
