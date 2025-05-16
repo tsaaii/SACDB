@@ -1,116 +1,116 @@
-Vendor,Cluster,S.no,ULB,Quantity to be remediated in MT,Quantity remediated upto 30th April 2025 in MT,Cumulative Quantity (2025-05-01),Cumulative Quantity (2025-05-02),Cumulative Quantity (2025-05-03),Cumulative Quantity (2025-05-04),Cumulative Quantity (2025-05-05),Cumulative Quantity (2025-05-06),Cumulative Quantity (2025-05-07),Cumulative Quantity (2025-05-08),Cumulative Quantity (2025-05-09),Cumulative Quantity (2025-05-10),Cumulative Quantity (2025-05-11),Cumulative Quantity (2025-05-12),Cumulative Quantity (2025-05-13)
+Vendor,Cluster,S.no,ULB,Quantity to be remediated in MT,Quantity remediated upto 30th April 2025 in MT,Cumulative Quantity (2025-05-01),Cumulative Quantity (2025-05-02),Cumulative Quantity (2025-05-03),Cumulative Quantity (2025-05-04),Cumulative Quantity (2025-05-05),Cumulative Quantity (2025-05-06),Cumulative Quantity (2025-05-07),Cumulative Quantity (2025-05-08),Cumulative Quantity (2025-05-09),Cumulative Quantity (2025-05-10),Cumulative Quantity (2025-05-11),Cumulative Quantity (2025-05-12),Cumulative Quantity (2025-05-13),Cumulative Quantity (2025-05-14),Cumulative Quantity (2025-05-15)
 Saurastra,"Kurnool
    
-",1,Kurnool,67308,67308,0,2257.68,3194.36,3896.77,4576.23,5125.96,5504.29,6158.62,6562.34,6852.25,7171.9,7601.66,7654.87162
+",1,Kurnool,67308,67308,0,2257.68,3194.36,3896.77,4576.23,5125.96,5504.29,6158.62,6562.34,6852.25,7171.9,7601.66,7654.87162,9721.686957,12197.80063
 Saurastra,"Kurnool
    
-",2,Dhone,50000,50000,0,0,0,0,0,0,0,0,0,0,0,0,0
+",2,Dhone,50000,50000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Kurnool
    
-",3,Yemmiganur,41357,41357,0,0,0,0,0,0,0,0,0,0,0,0,0
+",3,Yemmiganur,41357,41357,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Kurnool
    
-",4,Adoni,10000,10000,0,0,0,0,0,0,0,0,0,0,0,0,0
+",4,Adoni,10000,10000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Kurnool
    
-",5,Gudur(K),2666,2666,0,0,0,0,0,0,0,0,0,0,0,0,0
+",5,Gudur(K),2666,2666,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Nandyal  
   
-",6,Nandyal,80083,80083,0,2065.74,2994.37,3669.09,4216.68,4713.83,5220.94,5524.51,5816.71,6296.61,6712.48,6933.67,6982.20569
+",6,Nandyal,80083,80083,0,2065.74,2994.37,3669.09,4216.68,4713.83,5220.94,5524.51,5816.71,6296.61,6712.48,6933.67,6982.20569,8867.401226,11125.92832
 Saurastra,"Nandyal  
   
-",7,Bethamcherla,24189,24189,0,0,0,0,0,0,0,0,0,0,0,0,0
+",7,Bethamcherla,24189,24189,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Nandyal  
   
-",8,Nandikotkur,19700,19700,0,0,0,0,0,0,0,0,0,0,0,0,0
+",8,Nandikotkur,19700,19700,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Nandyal  
   
-",9,Atmakur(K),3596,3596,0,0,0,0,0,0,0,0,0,0,0,0,0
+",9,Atmakur(K),3596,3596,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Nandyal  
   
-",10,Giddalur,9773,9773,0,0,0,0,0,0,0,0,0,0,0,0,0
+",10,Giddalur,9773,9773,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Saurastra,"Nandyal  
   
-",11,Allagadda,6153,6153,0,0,0,0,0,0,0,0,0,0,0,0,0
-Sudhakar,Tenali,1,Tenali,63555,18654.6,0,13555.19,19446.27,23349.03,27421.04,30154.96,33785.6,35350.97,38158.86,41122.97,42793.16,44900.4,45214.7028
-Tharuni,Addanki   ,77,Ongole,61929,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,78,Addanki,58754,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,79,Markapuram,33877,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,80,Chirala,28392,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,81,Kandukuru,26160,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,82,Chimakurthy,14459,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,83,Kanigiri,11662,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,84,Darsi,1602,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Addanki   ,85,Podili,1075,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,8,Chilakaluripet,166278,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,9,Guntur,43811,11998,0,3821.48,5467.91,6580.9,7733.5,8354.43,9263.05,10244.86,10675.88,11239.11,12049.77,12617.71,12706.03397
-Tharuni,Chilakaluripeta  ,10,Narsaraopet,30609,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,11,Bapatla,46264,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,12,Macherla,30894,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,13,Piduguralla,10793,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,14,Vinukonda,11195,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,15,Dachepalli,6194,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,16,Ponnuru,8376,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,17,Repalle,7203,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,18,Gurazala,1675,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,19,Sattenapalle,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Chilakaluripeta  ,20,Mangalagiri Tadepalli,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,51,Eluru,53348,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,52,Gudivada,42953,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,53,Machilipatnam,41861,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,54,Bhimavaram,32358,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,55,Tadepalligudem,30258,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,56,Vijayawada,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,57,Jaggaiahpet,12987,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,58,Kondapalli,5000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,59,Nandigama,1398,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,60,Nuzvid,18458,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Eluru   ,61,Kovvur,915,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,71,Hindupur,49020,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,72,Dharmavaram,23000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,73,Madakasira,664,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,74,Puttaparthy,10299,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,75,Kadiri,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Hindupur   ,76,Penukonda,13578,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa Municipal Corporation,1,Kadapa,400000,0,0,1206.83,1699.3,2134.36,2427.21,2747.67,3026.52,3272.85,3480.97,3710.8,3910.14,4063.38,4091.82366
-Tharuni,Kadapa   ,62,Proddatur,70730,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,63,Rayachoti,94604,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,64,Badvel,11926,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,65,Rajampet,11800,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,66,Mydukur,11244,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,67,Pulivendula,10000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,68,Jammalamadugu,4916,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,69,Yerraguntla,2021,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kadapa   ,70,Kamalapuram,1763,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kakinada   ,5,Kakinada,300000,0,0,154.82,216.76,267.42,311.29,338.67,371.33,403.76,444.62,469,495.8,512.46,516.04722
-Tharuni,Kakinada   ,6,Palacole,30000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Kakinada   ,7,Amalapuram,27543,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Tharuni,Rajahmundry   ,2,Srikakulam,80978,0,0,599.75,818.88,1023.31,1178.12,1330.52,1446.15,1536.21,1660.17,1797.72,1840.27,1957.12,1970.81984
-Tharuni,Rajahmundry   ,3,Vizianagaram,30604,2828.35,0,2271.34,3117.27,3809.15,4504.42,5108.66,5584.67,5898.46,6458.75,6678.69,7146.52,7439.39,7491.46573
-Tharuni,Rajahmundry   ,4,Rajahmundry,76735,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,21,Anantapur,168285,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,22,Tadipatri,22735,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,23,Guntakal,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,24,Kalyanadurgam,7184,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,25,Rayadurgam,6919,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Anantapur   ,26,Gooty,4563,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,3,Chittoor,146232,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,4,Madanapalle,27532,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,5,B.Kothakota,25772,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,6,Punganur,22945,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,7,Kuppam,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Chittoor   ,8,Palamaneru,13177,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,GVMC,2,GVMC,201400,78202.2,0,26375.12,37550.05,46815.57,54020.32,60597.26,64339.53,70033.73,76777.4,79281.49,85019.94,88437.7,89056.7639
-Zigma,Nellore Municipal Corporation,1,Allipuram,35000,5526,0,3264.76,4601.69,5776.12,6746.27,7439.88,7950.85,8858.93,9454.65,9823.34,10454.73,10971.57,11048.37099
-Zigma,Nellore   ,15,Kavali,18536,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Nellore   ,16,Gudur(N),26563,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Nellore   ,17,Atmakur(N),12784,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Nellore   ,18,Buchireddypalem,6030,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Nellore   ,19,Naidupet,4186,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Nellore   ,20,Alluru,908,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,9,Tirupati,221473,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,10,Srikalahasti,50307,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,11,Sullurpet,38261,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,12,Nagari,21977,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,13,Puttur,20034,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-Zigma,Tirupati   ,14,Venkatagiri,15093,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+",11,Allagadda,6153,6153,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Sudhakar,Tenali,1,Tenali,63555,18654.6,0,13555.19,19446.27,23349.03,27421.04,30154.96,33785.6,35350.97,38158.86,41122.97,42793.16,44900.4,45214.7028,46915,47365
+Tharuni,Addanki,77,Ongole,61929,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,78,Addanki,58754,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,79,Markapuram,33877,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,80,Chirala,28392,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,81,Kandukuru,26160,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,82,Chimakurthy,14459,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,83,Kanigiri,11662,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,84,Darsi,1602,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Addanki,85,Podili,1075,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,8,Chilakaluripet,166278,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,9,Guntur,43811,11998,0,3821.48,5467.91,6580.9,7733.5,8354.43,9263.05,10244.86,10675.88,11239.11,12049.77,12617.71,12706.03397,16136.66314,20246.67124
+Tharuni,Chilakaluripeta,10,Narsaraopet,30609,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,11,Bapatla,46264,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,12,Macherla,30894,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,13,Piduguralla,10793,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,14,Vinukonda,11195,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,15,Dachepalli,6194,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,16,Ponnuru,8376,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,17,Repalle,7203,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,18,Gurazala,1675,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,19,Sattenapalle,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Chilakaluripeta,20,Mangalagiri Tadepalli,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,51,Eluru,53348,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,52,Gudivada,42953,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,53,Machilipatnam,41861,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,54,Bhimavaram,32358,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,55,Tadepalligudem,30258,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,56,Vijayawada,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,57,Jaggaiahpet,12987,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,58,Kondapalli,5000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,59,Nandigama,1398,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,60,Nuzvid,18458,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Eluru,61,Kovvur,915,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,71,Hindupur,49020,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,72,Dharmavaram,23000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,73,Madakasira,664,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,74,Puttaparthy,10299,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,75,Kadiri,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Hindupur,76,Penukonda,13578,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa Municipal Corporation,1,Kadapa,400000,0,0,1206.83,1699.3,2134.36,2427.21,2747.67,3026.52,3272.85,3480.97,3710.8,3910.14,4063.38,4091.82366,5196.616048,6520.194156
+Tharuni,Kadapa,62,Proddatur,70730,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,63,Rayachoti,94604,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,64,Badvel,11926,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,65,Rajampet,11800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,66,Mydukur,11244,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,67,Pulivendula,10000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,68,Jammalamadugu,4916,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,69,Yerraguntla,2021,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kadapa,70,Kamalapuram,1763,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kakinada,5,Kakinada,300000,0,0,154.82,216.76,267.42,311.29,338.67,371.33,403.76,444.62,469,495.8,512.46,516.04722,655.3799694,822.3052476
+Tharuni,Kakinada,6,Palacole,30000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Kakinada,7,Amalapuram,27543,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tharuni,Rajahmundry,2,Srikakulam,80978,0,0,599.75,818.88,1023.31,1178.12,1330.52,1446.15,1536.21,1660.17,1797.72,1840.27,1957.12,1970.81984,2502.941197,3140.44032
+Tharuni,Rajahmundry,3,Vizianagaram,30604,2828.35,0,2271.34,3117.27,3809.15,4504.42,5108.66,5584.67,5898.46,6458.75,6678.69,7146.52,7439.39,7491.46573,9514.161477,11937.41841
+Tharuni,Rajahmundry,4,Rajahmundry,76735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,21,Anantapur,168285,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,22,Tadipatri,22735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,23,Guntakal,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,24,Kalyanadurgam,7184,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,25,Rayadurgam,6919,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Anantapur,26,Gooty,4563,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,3,Chittoor,146232,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,4,Madanapalle,27532,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,5,B.Kothakota,25772,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,6,Punganur,22945,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,7,Kuppam,20000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Chittoor,8,Palamaneru,13177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,GVMC,2,GVMC,201400,78202.2,0,26375.12,37550.05,46815.57,54020.32,60597.26,64339.53,70033.73,76777.4,79281.49,85019.94,88437.7,89056.7639,113102.0902,141909.1925
+Zigma,Nellore Municipal Corporation,1,Allipuram,35000,5526,0,3264.76,4601.69,5776.12,6746.27,7439.88,7950.85,8858.93,9454.65,9823.34,10454.73,10971.57,11048.37099,14031.43116,17605.23667
+Zigma,Nellore,15,Kavali,18536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Nellore,16,Gudur(N),26563,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Nellore,17,Atmakur(N),12784,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Nellore,18,Buchireddypalem,6030,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Nellore,19,Naidupet,4186,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Nellore,20,Alluru,908,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,9,Tirupati,221473,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,10,Srikalahasti,50307,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,11,Sullurpet,38261,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,12,Nagari,21977,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,13,Puttur,20034,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Zigma,Tirupati,14,Venkatagiri,15093,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
