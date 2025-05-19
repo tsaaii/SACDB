@@ -22,11 +22,12 @@ def create_login_layout():
         dash component: The login layout
     """
     return html.Div([
-        html.Div(className='login-container', children=[
-            html.Div(className='logo', children=[
-                html.I(className='fas fa-leaf'),
-            ]),
-            html.H2('Swaccha Andhra Corporation', className='login-header'),
+    html.Div(className='login-container', children=[
+        html.Div(className='logo', children=[
+            # Replace leaf icon with logo.png image
+            html.Img(src="/assets/img/logo.png", className="login-logo")
+        ]),
+        html.H2('Swaccha Andhra Corporation', className='login-header'),
             
             dbc.Alert(
                 "Invalid username or password",

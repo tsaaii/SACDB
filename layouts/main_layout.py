@@ -10,6 +10,22 @@ from data_processing import load_data, get_dashboard_metrics
 from layouts.footer import create_footer
 
 
+def get_dashboard_layout():
+    from layouts.dashboard_layout import create_dashboard_layout
+    return create_dashboard_layout()
+
+def get_uploader_layout():
+    from layouts.uploader_layout import create_uploader_layout
+    return create_uploader_layout()
+
+def get_enhanced_public_landing():
+    from layouts.enhanced_public_landing import create_enhanced_public_landing
+    return create_enhanced_public_landing()
+
+def get_reports_layout():
+    from layouts.reports_layout import create_reports_layout
+    return create_reports_layout()
+
 # Define theme colors
 EMERALD = "#2ecc71"
 DARK_GREEN = "#27ae60" 
@@ -86,7 +102,7 @@ def create_public_landing_page():
         dbc.Container([
             html.A(
                 dbc.Row([
-                    dbc.Col(html.I(className="fas fa-leaf", style={"fontSize": "28px", "color": "white"}), width="auto"),
+                    dbc.Col(html.I(className="", style={"fontSize": "28px", "color": "white"}), width="auto"),
                     dbc.Col(dbc.NavbarBrand("Swaccha Andhra", style={"color": "white", "fontWeight": "bold", "fontSize": "24px"}), width="auto")
                 ], align="center", className="g-0"),
                 href="/",
@@ -253,6 +269,15 @@ def create_public_landing_page():
     ])
 
 # URL routing callback function (implemented in callbacks/auth_callbacks.py)
+
+def get_reports_layout():
+    """
+    Dynamically import the reports layout to avoid circular imports.
+    """
+    from layouts.reports_layout import create_reports_layout
+    return create_reports_layout()
+
+# Then update the display_page function to include the reports route:
 def display_page(pathname, is_authenticated):
     """
     Display the appropriate page based on URL and authentication state.
@@ -272,6 +297,10 @@ def display_page(pathname, is_authenticated):
     elif pathname == '/dashboard':
         if is_authenticated:
             return create_dashboard_layout()
+        return create_login_layout()
+    elif pathname == '/reports':  # Add this new route
+        if is_authenticated:
+            return get_reports_layout()
         return create_login_layout()
     else:
         # 404 page

@@ -49,7 +49,7 @@ def create_public_navbar():
                 # Logo and title - aligned to left
                 html.A(
                     dbc.Row([
-                        dbc.Col(html.I(className="fas fa-leaf", 
+                        dbc.Col(html.I(className="", 
                                        style={"fontSize": "18px", "color": "white"}),
                                 width="auto", className="me-1"), # Add margin between icon and text
                         dbc.Col([
@@ -90,7 +90,6 @@ def create_enhanced_public_landing():
     """
     Enhanced public landing page with improved UI:
     - Hidden navbar that appears on hover
-    - Palatino Linotype font implementation
     - Properly sized and formatted progress gauge
     - Better spacing and alignment
     
@@ -98,10 +97,9 @@ def create_enhanced_public_landing():
         dash component: The public landing page
     """
     return html.Div(style={
-        "backgroundColor": BG_COLOR, 
+        "backgroundColor": "var(--powerbi-background)", 
         "minHeight": "100vh",
-        "color": TEXT_DARK,
-        "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"
+        "color": "var(--powerbi-text-dark)"
     }, children=[
         # Hidden navbar that appears on hover
         create_public_navbar(),
@@ -112,35 +110,38 @@ def create_enhanced_public_landing():
             dbc.Row([
                 dbc.Col([
                     html.Div([
-                        html.I(className="fas fa-clock me-2", style={"color": DARK_GREEN}),
-                        html.Span(id="navbar-clock", style={"fontWeight": 500, 
-                                                           "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                        html.I(className="fas fa-clock me-2", style={"color": "var(--powerbi-primary)"}),
+                        html.Span(id="navbar-clock", style={"fontWeight": 500})
                     ], className="d-flex align-items-center")
                 ], sm=6, className="mb-1 mt-1"),
                 dbc.Col([
                     html.Div([
                         html.Span("Auto-refreshing data ", className="me-2", 
-                                 style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif", 
-                                        "fontSize": "0.9rem"}),
+                                 style={"fontSize": "0.9rem"}),
                         html.I(id="refresh-indicator", className="fas fa-sync-alt fa-spin", 
-                              style={"color": DARK_GREEN})
+                              style={"color": "var(--powerbi-primary)"})
                     ], className="d-flex align-items-center justify-content-end")
                 ], sm=6, className="mb-1 mt-1 text-end")
             ], className="bg-white rounded shadow-sm py-1 px-3 mb-3"), # Increased bottom margin
             
-            # Title section
+            # Title section with logos
             dbc.Row([
                 dbc.Col([
-                    html.H2([
-                        "Swaccha Andhra Waste Remediation ",
-                        html.Small("Real-time monitoring dashboard", 
-                                  className="d-block", 
-                                  style={"fontSize": "1rem", "fontWeight": "400", 
-                                         "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
-                    ], className="text-center mb-3", # Maintain bottom margin
-                       style={"color": DARK_GREEN, "fontWeight": "600", "fontSize": "1.8rem", 
-                              "fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
-                              "letterSpacing": "0.4px"})
+                    html.Div([
+                        # Left logo
+                        html.Img(src="/assets/img/goAP.png", className="title-logo title-logo-left"),
+                        # Title in the center
+                        html.H2([
+                            "Swaccha Andhra Waste Remediation ",
+                            html.Small("Real-time monitoring dashboard", 
+                                      className="d-block", 
+                                      style={"fontSize": "1rem", "fontWeight": "400"})
+                        ], className="text-center mb-3", # Maintain bottom margin
+                           style={"color": "var(--powerbi-primary)", "fontWeight": "600", "fontSize": "1.8rem",
+                                  "letterSpacing": "0.4px"}),
+                        # Right logo
+                        html.Img(src="/assets/img/logo.png", className="title-logo title-logo-right"),
+                    ], className="title-container")
                 ], width=12)
             ]),
             
@@ -177,10 +178,9 @@ def create_enhanced_public_landing():
                 html.Div([
                     html.P([
                         "Made in Andhra Pradesh, with ",
-                        html.I(className="fas fa-heart", style={"color": "#e74c3c"}),
+                        html.I(className="fas fa-heart", style={"color": "var(--powerbi-accent3)"}),
                         " • © 2025 Advitia Labs"
-                    ], className="text-center text-muted small mb-0", 
-                       style={"fontFamily": "'Palatino Linotype', 'Book Antiqua', Palatino, serif"})
+                    ], className="text-center text-muted small mb-0")
                 ])
             ]),
             style={

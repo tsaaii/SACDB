@@ -11,6 +11,7 @@ import os
 import time
 import threading
 from callbacks.enhanced_public_callbacks import register_enhanced_public_callbacks
+from callbacks.reports_callbacks import register_reports_callbacks
 
 
 # Create a Flask server - Using environment variables for production
@@ -141,6 +142,7 @@ app.layout = create_main_layout()
 register_auth_callbacks(app)
 register_dashboard_callbacks(app)
 register_enhanced_public_callbacks(app)  
+register_reports_callbacks(app)
 
 # Add endpoint to get last modified time
 @server.route('/api/data-modified-time')

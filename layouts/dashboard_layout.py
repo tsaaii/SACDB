@@ -155,7 +155,7 @@ def create_navbar():
         dbc.Container([
             html.A(
                 dbc.Row([
-                    dbc.Col(html.I(className="fas fa-leaf", style={"font-size": "24px"}), width="auto"),
+                    dbc.Col(html.I(className="", style={"font-size": "24px"}), width="auto"),
                     dbc.Col(dbc.NavbarBrand("Swaccha Andhra", style={"color": "white", "font-weight": "bold"}), width="auto")
                 ], align="center", className="g-0"),
                 href="/dashboard",
@@ -164,7 +164,7 @@ def create_navbar():
             dbc.Nav([
                 dbc.NavItem(dbc.NavLink("Dashboard", href="/dashboard", active=True, className="text-white")),
                 dbc.NavItem(dbc.NavLink("Uploader", href="/uploader", className="text-white")),
-                dbc.NavItem(dbc.NavLink("Reports", href="#", className="text-white")),
+                dbc.NavItem(dbc.NavLink("Reports", href="/reports", className="text-white")),
                 dbc.NavItem(dbc.NavLink("Settings", href="#", className="text-white")),
                 dbc.NavItem(dbc.Button("Logout", id="logout-button", color="light", size="sm", className="ms-2")),
             ], className="ms-auto", navbar=True),
