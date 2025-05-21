@@ -26,7 +26,7 @@ Fixed create_remediation_map function
 
 def create_remediation_map(dataframe):
     """
-    Create a map visualization of remediation status by ULB.
+    Create a map visualization of remediation status by ULB with vendor-specific colors.
     
     Args:
         dataframe (pandas.DataFrame): The remediation data
@@ -47,16 +47,31 @@ def create_remediation_map(dataframe):
         
         latest_date_col = date_columns[-1]
         
+        # Define vendor-specific colors - use icon colors that are supported by Folium
+        vendor_colors = {
+            'Zigma': '#FF6D00',     # Bright orange
+            'Tharuni': '#2979FF',   # Bright blue
+            'Saurastra': '#6200EA', # Bright purple
+            'Sudhakar': '#00BFA5',  # Bright teal
+        }
+        
+        # Icon colors that are available in Folium
+        vendor_icon_colors = {
+            'Zigma': 'orange',
+            'Tharuni': 'blue',
+            'Saurastra': 'purple',
+            'Sudhakar': 'green'
+        }
+        
         # Create a base map centered on Andhra Pradesh
         AP_CENTER = [16.2207, 80.1276]
         m = folium.Map(location=AP_CENTER, zoom_start=7, tiles="CartoDB positron")
         
         # Create a marker cluster to group nearby markers
-        marker_cluster = folium.MarkerCluster().add_to(m)
+        marker_cluster = folium.plugins.MarkerCluster().add_to(m)
         
         # Since we don't have actual coordinates in the CSV, 
         # we'll create pseudo-random coordinates for demonstration
-        # In a real implementation, you would use actual coordinates for each ULB
         import numpy as np
         
         # Get ULB data
@@ -95,64 +110,95 @@ def create_remediation_map(dataframe):
             current = row[latest_date_col]
             percent = row['Percent Complete']
             
-            # Determine color based on completion percentage
-            if percent < 25:
-                color = 'lightgray'
-            elif percent < 50:
-                color = 'lightgreen'
-            elif percent < 75:
-                color = 'green'
+            # Determine icon color based on vendor and completion percentage
+            # Use standard Folium icon colors which are limited
+            if vendor in vendor_icon_colors:
+                if percent < 25:
+                    icon_color = 'lightgray' 
+                elif percent < 50:
+                    icon_color = 'beige'
+                elif percent < 75:
+                    icon_color = vendor_icon_colors[vendor]
+                else:
+                    icon_color = vendor_icon_colors[vendor]
             else:
-                color = 'darkgreen'
+                # Fallback color scheme
+                if percent < 25:
+                    icon_color = 'lightgray'
+                elif percent < 50:
+                    icon_color = 'lightgreen'
+                elif percent < 75:
+                    icon_color = 'green'
+                else:
+                    icon_color = 'darkgreen'
             
-            # Create popup content
+            # Create popup content with vendor-specific styling
+            # Use the hex colors for styling within HTML
             popup_html = f"""
-            <div style="font-family: Arial; width: 200px;">
-                <h4 style="color: #27ae60;">{ulb}</h4>
-                <p><b>Cluster:</b> {cluster}</p>
-                <p><b>Vendor:</b> {vendor}</p>
-                <p><b>Target:</b> {target:,.0f} MT</p>
-                <p><b>Remediated:</b> {current:,.0f} MT</p>
-                <div style="background-color: #eee; height: 10px; width: 100%; border-radius: 5px;">
-                    <div style="background-color: #2ecc71; height: 10px; width: {min(percent, 100)}%; border-radius: 5px;"></div>
+            <div style="font-family: 'Segoe UI', Tahoma, sans-serif; width: 220px;">
+                <h4 style="color: {vendor_colors.get(vendor, '#27ae60')}; border-bottom: 2px solid {vendor_colors.get(vendor, '#27ae60')}; padding-bottom: 5px;">{ulb}</h4>
+                <p style="margin: 5px 0;"><b>Cluster:</b> {cluster}</p>
+                <p style="margin: 5px 0;"><b>Vendor:</b> {vendor}</p>
+                <p style="margin: 5px 0;"><b>Target:</b> {target:,.0f} MT</p>
+                <p style="margin: 5px 0;"><b>Remediated:</b> {current:,.0f} MT</p>
+                <div style="background-color: #f3f3f3; height: 12px; width: 100%; border-radius: 6px; margin: 8px 0;">
+                    <div style="background-color: {vendor_colors.get(vendor, '#27ae60')}; height: 12px; width: {min(percent, 100)}%; border-radius: 6px;"></div>
                 </div>
-                <p><b>Progress:</b> {percent:.1f}%</p>
+                <p style="text-align: center; font-weight: bold; margin: 5px 0;"><b>Progress:</b> {percent:.1f}%</p>
             </div>
             """
             
-            # Add marker to the cluster
+            # Add marker to the cluster with appropriate icon
             folium.Marker(
                 location=[row['lat'], row['lon']],
                 popup=folium.Popup(popup_html, max_width=300),
-                icon=folium.Icon(color=color, icon='info-sign'),
+                icon=folium.Icon(color=icon_color, icon='info-sign'),
                 tooltip=f"{ulb} - {percent:.1f}%"
             ).add_to(marker_cluster)
         
-        # Add a legend
+        # Add a legend with vendor-specific colors
         legend_html = '''
         <div style="position: fixed; 
                     bottom: 50px; right: 50px; 
                     border: 2px solid grey; z-index: 9999; 
                     background-color: white;
-                    padding: 10px;
-                    border-radius: 5px;
-                    font-family: Arial;">
-            <h4 style="margin-top: 0;">Completion Status</h4>
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-family: 'Segoe UI', Tahoma, sans-serif;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h4 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">Completion Status</h4>
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                <div style="background-color: lightgray; width: 20px; height: 20px; margin-right: 10px;"></div>
+                <div style="background-color: lightgray; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
                 <div>0-25%</div>
             </div>
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                <div style="background-color: lightgreen; width: 20px; height: 20px; margin-right: 10px;"></div>
+                <div style="background-color: beige; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
                 <div>25-50%</div>
             </div>
             <div style="display: flex; align-items: center; margin-bottom: 5px;">
-                <div style="background-color: green; width: 20px; height: 20px; margin-right: 10px;"></div>
+                <div style="background-color: green; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
                 <div>50-75%</div>
             </div>
-            <div style="display: flex; align-items: center;">
-                <div style="background-color: darkgreen; width: 20px; height: 20px; margin-right: 10px;"></div>
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <div style="background-color: darkgreen; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
                 <div>75-100%</div>
+            </div>
+            <h4 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">Vendors</h4>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="background-color: #FF6D00; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
+                <div>Zigma</div>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="background-color: #2979FF; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
+                <div>Tharuni</div>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <div style="background-color: #6200EA; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
+                <div>Saurastra</div>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <div style="background-color: #00BFA5; width: 20px; height: 20px; margin-right: 10px; border-radius: 3px;"></div>
+                <div>Sudhakar</div>
             </div>
         </div>
         '''

@@ -20,8 +20,7 @@ BG_COLOR = "#f1f9f5"
 
 def create_progress_gauge(percent_complete):
     """
-    Create a gauge chart for overall progress with 20% reduced size
-    to fit perfectly in cards while maintaining visibility of all elements.
+    Create a gauge chart for overall progress with improved design and alignment.
     
     Args:
         percent_complete (float): Percentage completion value
@@ -29,6 +28,15 @@ def create_progress_gauge(percent_complete):
     Returns:
         plotly.graph_objects.Figure: The gauge chart figure
     """
+    # Define color stops
+    color_stops = [
+        [0, "#f5f5f5"],        # Light gray for empty
+        [0.25, "#BBDEFB"],     # Light blue at 25%
+        [0.5, "#2979FF"],      # Bright blue at 50% 
+        [0.75, "#00BFA5"],     # Teal at 75%
+        [1, "#2E8B57"]         # SeaGreen at 100%
+    ]
+    
     fig = go.Figure()
     
     fig.add_trace(go.Indicator(
@@ -38,42 +46,44 @@ def create_progress_gauge(percent_complete):
         gauge={
             'axis': {
                 'range': [0, 100],
-                'tickwidth': 1.2,  # Slightly thinner ticks
+                'tickwidth': 1,
                 'tickcolor': "#555555",
                 'visible': True,
-                'tickfont': {'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'size': 10},  # Reduced font size by 20%
+                'tickfont': {'family': 'Segoe UI, Tahoma, sans-serif', 'size': 10},
                 'tickmode': 'array',
-                'tickvals': [0, 20, 40, 60, 80, 100],
-                'ticktext': ['0', '20', '40', '60', '80', '100'],
+                'tickvals': [0, 25, 50, 75, 100],
+                'ticktext': ['0', '25', '50', '75', '100'],
                 'showticklabels': True,
             },
-            'bar': {'color': EMERALD, 'thickness': 0.6},  # Reduced thickness by 20%
+            'bar': {'color': "#2E8B57", 'thickness': 0.6},
             'bgcolor': "white",
             'borderwidth': 0,
             'steps': [
-                {'range': [0, 100], 'color': LIGHT_GREEN}
+                {'range': [0, 25], 'color': color_stops[0][1]},
+                {'range': [25, 50], 'color': color_stops[1][1]},
+                {'range': [50, 75], 'color': color_stops[2][1]},
+                {'range': [75, 100], 'color': color_stops[3][1]}
             ],
             'threshold': {
-                'line': {'color': "red", 'width': 1.6},  # Reduced width by 20%
-                'thickness': 0.6,  # Reduced thickness by 20%
-                'value': 90
+                'line': {'color': "red", 'width': 1.5},
+                'thickness': 0.6,
+                'value': 95
             }
         },
         number={
             'suffix': "%", 
-            'font': {'size': 22, 'family': 'Palatino Linotype, Book Antiqua, Palatino, serif', 'color': DARK_GREEN},  # Reduced size by 20%
-            'valueformat': '.1f',
-            'prefix': ' '  # Add a small space before the number to shift it inward
+            'font': {'size': 22, 'family': 'Segoe UI, Tahoma, sans-serif', 'color': "#2E8B57"},
+            'valueformat': '.1f'
         }
     ))
     
-    # Update layout with 20% reduced height and adjusted internal padding
+    # Update layout with better padding and alignment
     fig.update_layout(
-        margin=dict(l=19, r=19, t=20, b=19),  # Increased horizontal and bottom margins by 3px to bring content inward
+        margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor="white",
         autosize=True,
-        height=112,  # Reduced height by 20% (from 140)
-        font_family="Palatino Linotype, Book Antiqua, Palatino, serif",
+        height=112,
+        font_family="Segoe UI, Tahoma, sans-serif",
         xaxis=dict(visible=False),
         yaxis=dict(visible=False)
     )
@@ -185,6 +195,7 @@ def create_daily_progress_chart(dataframe, filtered_date_columns=None):
 def create_vendor_comparison(dataframe):
     """
     Create a bar chart comparing vendor performance.
+    Using consistent vendor-specific colors.
     
     Args:
         dataframe (pandas.DataFrame): The remediation data or vendor stats
@@ -192,6 +203,26 @@ def create_vendor_comparison(dataframe):
     Returns:
         plotly.graph_objects.Figure: Bar chart figure
     """
+    # Define vendor colors using standard hex colors without transparency
+    vendor_colors = {
+        'Zigma': '#FF6D00',     # Bright orange
+        'Tharuni': '#2979FF',   # Bright blue
+        'Saurastra': '#6200EA', # Bright purple
+        'Sudhakar': '#00BFA5',  # Bright teal
+        # Add fallback color for other vendors
+        'default': '#27ae60'    # Default green
+    }
+    
+    # Define the target colors with lower opacity (using rgba)
+    target_vendor_colors = {
+        'Zigma': 'rgba(255, 109, 0, 0.5)',     # Transparent orange
+        'Tharuni': 'rgba(41, 121, 255, 0.5)',   # Transparent blue
+        'Saurastra': 'rgba(98, 0, 234, 0.5)', # Transparent purple
+        'Sudhakar': 'rgba(0, 191, 165, 0.5)',  # Transparent teal
+        # Add fallback color for other vendors
+        'default': 'rgba(39, 174, 96, 0.5)'    # Transparent green
+    }
+    
     # Check if dataframe is a vendor stats dataframe (from metrics)
     if 'Vendor' in dataframe.columns and 'Percent Complete' in dataframe.columns:
         vendor_stats = dataframe
@@ -277,11 +308,22 @@ def create_vendor_comparison(dataframe):
             # If we can't find a suitable column, create a dummy one
             vendor_stats[target_col] = 100
     
+    # Create color array based on vendor names
+    target_colors = []
+    completed_colors = []
+    for vendor in vendor_stats['Vendor']:
+        # Get color for this vendor, fall back to default if not found
+        target_colors.append(target_vendor_colors.get(vendor, target_vendor_colors['default']))
+        completed_colors.append(vendor_colors.get(vendor, vendor_colors['default']))
+    
     fig.add_trace(go.Bar(
         x=vendor_stats['Vendor'],
         y=vendor_stats[target_col],
         name='Target',
-        marker_color='#8B4513'  # SaddleBrown color
+        marker_color=target_colors,  # Use vendor-specific colors with transparency
+        opacity=0.8,
+        customdata=vendor_stats['Vendor'],  # Store vendor names for hover
+        hovertemplate='<b>%{customdata}</b><br>Target: %{y:,.0f} MT<extra></extra>'
     ))
     
     # Completed
@@ -290,7 +332,9 @@ def create_vendor_comparison(dataframe):
             x=vendor_stats['Vendor'],
             y=vendor_stats[latest_date_col],
             name='Completed',
-            marker_color='#2E8B57'  # SeaGreen color
+            marker_color=completed_colors,  # Use vendor-specific colors
+            customdata=vendor_stats['Vendor'],  # Store vendor names for hover
+            hovertemplate='<b>%{customdata}</b><br>Completed: %{y:,.0f} MT<extra></extra>'
         ))
     
     fig.update_layout(
@@ -305,18 +349,40 @@ def create_vendor_comparison(dataframe):
         height=300
     )
     
+    # Add font styling
+    fig.update_layout(
+        font=dict(
+            family="Segoe UI, Tahoma, sans-serif",
+            size=12,
+            color="#333333"
+        )
+    )
+    
+    # Update bargap for better spacing
+    fig.update_layout(bargap=0.2, bargroupgap=0.1)
+    
+    # Add grid lines for better readability
+    fig.update_yaxes(
+        showgrid=True,
+        gridwidth=1,
+        gridcolor="rgba(0, 0, 0, 0.1)"
+    )
+    
     return fig
 
 def create_cluster_heatmap(dataframe):
     """
-    Create a heatmap showing cluster progress.
-    
-    Args:
-        dataframe (pandas.DataFrame): The remediation data
-        
-    Returns:
-        plotly.graph_objects.Figure: Heatmap figure
+    Create a heatmap showing cluster progress with improved color styling.
     """
+    # Define vendor colors with a gradient
+    color_scale = [
+        [0, 'lightgray'],      # Start with lightgray
+        [0.25, '#BBDEFB'],     # Light blue at 25%
+        [0.5, '#2979FF'],      # Bright blue at 50%
+        [0.75, '#00BFA5'],     # Teal at 75%
+        [1, '#2E8B57']         # End with SeaGreen
+    ]
+    
     # Check if dataframe is empty
     if dataframe.empty:
         fig = go.Figure()
@@ -369,12 +435,12 @@ def create_cluster_heatmap(dataframe):
         # Sort by percentage
         cluster_data = cluster_data.sort_values('Percent Complete', ascending=False)
         
-        # Create heatmap
+        # Create heatmap with improved color scale
         fig = px.imshow(
             [cluster_data['Percent Complete']],
             x=cluster_data['Cluster'],
             labels=dict(x="Cluster", y="", color="Completion %"),
-            color_continuous_scale=[[0, 'lightgray'], [0.5, LIGHT_GREEN], [1, DARK_GREEN]],
+            color_continuous_scale=color_scale,
             text_auto='.1f'
         )
         

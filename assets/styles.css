@@ -1162,3 +1162,92 @@ footer hr {
     border: 1px double #27ae60;
     color: #27ae60;
   }
+
+
+  :root {
+    /* Add vendor-specific colors */
+    --vendor-zigma: #FF6D00;        /* Bright orange */
+    --vendor-tharuni: #2979FF;      /* Bright blue */
+    --vendor-saurastra: #6200EA;    /* Bright purple */
+    --vendor-sudhakar: #00BFA5;     /* Bright teal */
+    
+    /* Light versions for backgrounds, hover states */
+    --vendor-zigma-light: #FFECB3;
+    --vendor-tharuni-light: #BBDEFB;
+    --vendor-saurastra-light: #D1C4E9;
+    --vendor-sudhakar-light: #B2DFDB;
+  }
+  
+  /* Vendor-specific styling for data points and cards */
+  .vendor-zigma {
+    color: var(--vendor-zigma) !important;
+    fill: var(--vendor-zigma) !important;
+  }
+  
+  .vendor-tharuni {
+    color: var(--vendor-tharuni) !important;
+    fill: var(--vendor-tharuni) !important;
+  }
+  
+  .vendor-saurastra {
+    color: var(--vendor-saurastra) !important;
+    fill: var(--vendor-saurastra) !important;
+  }
+  
+  .vendor-sudhakar {
+    color: var(--vendor-sudhakar) !important;
+    fill: var(--vendor-sudhakar) !important;
+  }
+  
+  /* Background colors for cards */
+  .bg-vendor-zigma {
+    background-color: var(--vendor-zigma-light) !important;
+    border-left: 4px solid var(--vendor-zigma) !important;
+  }
+  
+  .bg-vendor-tharuni {
+    background-color: var(--vendor-tharuni-light) !important;
+    border-left: 4px solid var(--vendor-tharuni) !important;
+  }
+  
+  .bg-vendor-saurastra {
+    background-color: var(--vendor-saurastra-light) !important;
+    border-left: 4px solid var(--vendor-saurastra) !important;
+  }
+  
+  .bg-vendor-sudhakar {
+    background-color: var(--vendor-sudhakar-light) !important;
+    border-left: 4px solid var(--vendor-sudhakar) !important;
+  }
+
+  .gauge-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 112px;
+    position: relative;
+    padding: 0;
+    margin: 0 auto;
+  }
+  
+  .centered-gauge {
+    margin: 0 auto !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 140px !important;
+    transform-origin: center center !important;
+  }
+  
+  /* Ensure that card heights are equal */
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .card-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px !important;
+  }

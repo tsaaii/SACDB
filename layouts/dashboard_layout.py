@@ -238,7 +238,8 @@ def create_summary_cards():
             dbc.Card([
                 dbc.CardBody([
                     html.Div([
-                        html.H5("Overall Progress", className="card-title mb-2"),
+                        # Title with proper margin and alignment
+                        html.H5("Overall Progress", className="card-title mb-2 text-center"),
                         # Wrap the gauge in a proper container for responsive centering
                         html.Div([
                             dcc.Graph(
@@ -246,21 +247,20 @@ def create_summary_cards():
                                 config={'displayModeBar': False},
                                 className="centered-gauge",
                                 style={
-                                    'height': '140px',  # Increased height
+                                    'height': '140px',
                                     'margin': '0 auto',
                                     'display': 'block'
                                 }
                             )
                         ], className="d-flex justify-content-center align-items-center gauge-container"),
                         html.P(f"{percent_complete:.1f}% Complete", 
-                              className="card-text text-center mt-2 mb-0", 
-                              style={"fontSize": "1.2rem", "fontWeight": "500", "color": DARK_GREEN})
-                    ], id="progress-gauge-card")
+                            className="card-text text-center mt-2 mb-0", 
+                            style={"fontSize": "1.2rem", "fontWeight": "500", "color": DARK_GREEN})
+                    ], id="progress-gauge-card", className="text-center")
                 ], style=card_body_style)
             ], style=card_style)
         ], md=4, className="mb-4")
-    ], className="mb-4")
-
+    ])
 
 def create_filters():
     """
